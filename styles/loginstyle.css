@@ -1,0 +1,89 @@
+.login-wrapper, .login-wrapper * { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: Georgia, serif; 
+}
+
+.login-wrapper { 
+    height: 100vh; 
+    width: 100vw;
+    background: url("/bg.jpg") no-repeat center center/cover; 
+}
+
+/* Light transparent overlay */
+.overlay {
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Login Card */
+.login-card {
+    width: 70%;
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+/* Header */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    width: 80px;
+}
+
+.title h1 {
+    font-size: 28px;
+}
+
+.title p {
+    font-size: 18px;
+}
+
+/* Welcome */
+.login-card h2 {
+    margin: 20px 0;
+}
+
+/* Inputs */
+form {
+    width: 60%;
+    margin: auto;
+}
+
+form input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+/* Button */
+button {
+    margin-top: 15px;
+    width: 50%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    background: #7c4dff;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #5e35b1;
+}
