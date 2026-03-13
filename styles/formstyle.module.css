@@ -1,187 +1,22 @@
-.header{
-    background-color: #8e6f8f;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 20px;   /* mas maliit na padding */
-}
+/* styles/formstyle.module.css */
+.formWrapper, .formWrapper * { font-family: Arial, sans-serif; box-sizing: border-box; }
+.formWrapper { padding-bottom: 35px; background-color: white; min-height: 100vh; }
 
-.header img{
-    width: 40px;   /* liitan logo */
-    height: 40px;
-    margin-right: 10px;
-}
+.formWrapper table { width:100%; border-collapse:collapse; margin-top:20px; }
+.formWrapper th, .formWrapper td { border:1px solid black; padding:8px; font-size:14px; }
+.formWrapper th { background:#e6e6e6; }
+.formWrapper table input { width:95%; border:none; outline:none; }
 
-.header h2{
-    font-size: 16px;
-    margin: 0;
-}
+.container { margin-top: 90px; }
+.sectionTitle { background:#8c6d8c; color:white; text-align:center; padding:10px; margin:20px auto; width:60%; font-weight:bold; }
+.formSection { width:65%; margin:auto; margin-top:20px; }
+.question { margin-top:20px; font-weight:500; }
+.radioOption { display:block; margin:8px 0 8px 25px; font-size:14px; }
+.radioOption input { margin-right:10px; transform:scale(1.2); }
+.lineInput { border:none; border-bottom:2px solid #999; width:400px; padding:5px; font-size:14px; outline:none; }
 
-.header h3{
-    font-size: 14px;
-    margin: 0;
-    flex: 1;
-    text-align: center;
-}
-
-.line-input{
-    border:none;
-    border-bottom:2px solid #999;
-    width:400px;
-    padding:5px;
-    font-size:14px;
-    outline:none;
-}
-
-
-
-.dropdown{
-    position:relative;
-}
-
-.dropbtn{
-    background:none;
-    border:none;
-    color:white;
-    font-size:15px;
-    cursor:pointer;
-}
-
-.dropdown-content{
-    display:none;
-    position:absolute;
-    right:0;
-    background:white;
-    min-width:120px;
-    border-radius:10px;
-    box-shadow:0 2px 10px rgba(0,0,0,0.2);
-}
-
-.dropdown-content a{
-    display:block;
-    padding:10px;
-    text-decoration:none;
-    color:black;
-}
-
-.logout{
-    color:red;
-}
-
-/* Targets the wrapper and sets a base font so it matches your original design */
-.form-wrapper, .form-wrapper * {
-    font-family: Arial, sans-serif;
-}
-
-.form-wrapper {
-    padding-bottom: 35px;
-    background-color: white;
-    min-height: 100vh;
-}
-
-.radio-option{
-display:block;
-margin:8px 0;
-font-size:14px;
-}
-
-.radio-option input{
-margin-right:10px;
-}
-
-.section-title{
-background:#8c6d8c;
-color:white;
-text-align:center;
-padding:10px;
-margin:20px auto;
-width:60%;
-font-weight:bold;
-}
-/* HOUSING FORM CENTER */
-.form-section{
-    width:65%;
-    margin:auto;
-    margin-top:20px;
-}
-
-/* QUESTION TEXT */
-.question{
-    margin-top:20px;
-    font-weight:500;
-}
-
-/* RADIO OPTIONS */
-.radio-option{
-    display:block;
-    margin:8px 0 8px 25px;
-    font-size:14px;
-}
-
-/* RADIO BUTTON SIZE */
-.radio-option input{
-    margin-right:10px;
-    transform:scale(1.2);
-}
-
-.health-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-}
-
-.health-table th,
-.health-table td{
-    border:1px solid black;
-    padding:8px;
-    font-size:14px;
-}
-
-.health-table th{
-    background:#e6e6e6;
-}
-
-.health-table input{
-    width:95%;
-    border:none;
-    outline:none;
-}
-
-.submit-container{
-    display:flex;
-    justify-content:flex-end;
-    margin-top:20px;
-}
-
-.submit-btn{
-    background:#6cc04a;
-    color:white;
-    border:none;
-    padding:10px 30px;
-    border-radius:25px;
-    font-size:14px;
-    cursor:pointer;
-}
-
-.submit-btn:hover{
-    background:#5aa73d;
-}
-.footer{
-    background:#8c6d8c;
-    height:35px;
-    width:100%;
-    position:fixed;
-    bottom:0;
-    left:0;
-}
-
-.footer p{
-    color:white;
-    text-align:center;
-    font-size:13px;
-    margin-top:8px;
-}
-
-
-
+.submitContainer { display:flex; justify-content:flex-end; margin-top:20px; }
+.submitBtn { background:#6cc04a; color:white; border:none; padding:10px 30px; border-radius:25px; font-size:14px; cursor:pointer; }
+.submitBtn:hover { background:#5aa73d; }
+.footer { background:#8c6d8c; height:35px; width:100%; position:fixed; bottom:0; left:0; display:flex; align-items:center; justify-content:center;}
+.footer p { color:white; font-size:13px; margin:0;}
