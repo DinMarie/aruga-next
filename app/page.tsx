@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
-import '../styles/loginstyle.css'; // Standard CSS import
+import styles from '../styles/loginstyle.module.css'; 
 
 const MAX_ATTEMPTS = 5;
 const LOCK_SECONDS = 10;
@@ -18,7 +18,6 @@ export default function LoginPage() {
   const [lockTimeRemaining, setLockTimeRemaining] = useState(0);
   const router = useRouter();
 
-  // Check lock status on load
   useEffect(() => {
     const lockUntil = localStorage.getItem("lockUntil");
     if (lockUntil && Date.now() < parseInt(lockUntil)) {
@@ -81,21 +80,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="login-wrapper">
-      <div className="overlay">
-        <div className="login-card">
-          <div className="header">
-            <img src="/logo1.png" className="logo" alt="City Logo" />
-            <div className="title">
+    <div className={styles.loginWrapper}>
+      <div className={styles.overlay}>
+        <div className={styles.loginCard}>
+          <div className={styles.header}>
+            <img src="/logo1.png" className={styles.logo} alt="City Logo" />
+            <div className={styles.title}>
               <h1>City Social Welfare and Development Office</h1>
               <p>City of Biñan</p>
             </div>
-            <img src="/cswd.png" className="logo" alt="CSWD Logo" />
+            <img src="/cswd.png" className={styles.logo} alt="CSWD Logo" />
           </div>
 
           <h2>Welcome Back!</h2>
 
-          {/* Custom Notification Area */}
           {error && <div style={{ background: '#e74c3c', color: 'white', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontWeight: 'bold' }}>{error}</div>}
           {success && <div style={{ background: '#2ecc71', color: 'white', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontWeight: 'bold' }}>{success}</div>}
 

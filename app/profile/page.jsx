@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Header from '../../components/Header';
-import '../../styles/profilestyle.css';
+import styles from '../../styles/profilestyle.module.css';
 
 export default function ProfilePage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -14,54 +14,54 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="profile-wrapper">
+    <div className={styles.profileWrapper}>
       <Header subtitle="Aruga Project Profiling and Assessment Details" />
 
-      <div className="container" style={{ marginTop: '90px' }}>
-        <div className="container-right">
-          <button className="update-btn" onClick={handleSave}>UPDATE</button>
-          <button className="delete-btn" onClick={() => setShowDeleteModal(true)}>DELETE</button>
+      <div className={styles.container} style={{ marginTop: '90px' }}>
+        <div className={styles.containerRight}>
+          <button className={styles.updateBtn} onClick={handleSave}>UPDATE</button>
+          <button className={styles.deleteBtn} onClick={() => setShowDeleteModal(true)}>DELETE</button>
         </div>
 
-        <div className="top-row">
-          <div className="field-group"><label>Date of Interview:</label><input type="date" id="dateInterview" /></div>
-          <div className="field-group"><label>Time Started:</label><input type="time" id="timeStart" /></div>
-          <div className="field-group"><label>Time Ended:</label><input type="time" id="timeEnd" /></div>
+        <div className={styles.topRow}>
+          <div className={styles.fieldGroup}><label>Date of Interview:</label><input type="date" id="dateInterview" /></div>
+          <div className={styles.fieldGroup}><label>Time Started:</label><input type="time" id="timeStart" /></div>
+          <div className={styles.fieldGroup}><label>Time Ended:</label><input type="time" id="timeEnd" /></div>
         </div>
 
-        <div className="info-section">
-          <div className="form-row"><label>Name of Interviewer:</label><input type="text" className="line-input" /></div>
-          <div className="form-row"><label>Household ID No.:</label><input type="text" className="line-input" /></div>
-          <div className="form-row"><label>Region:</label><input type="text" className="line-input" /></div>
-          <div className="form-row"><label>Pantawid Member?</label><input type="text" className="line-input" /></div>
-          <div className="form-row"><label>Province:</label><input type="text" className="line-input" /></div>
-          <div className="form-row"><label>Name of Respondent:</label><input type="text" className="line-input" /></div>
-          <div className="form-row"><label>Address:</label><input type="text" className="line-input" /></div>
+        <div className={styles.infoSection}>
+          <div className={styles.formRow}><label>Name of Interviewer:</label><input type="text" className={styles.lineInput} /></div>
+          <div className={styles.formRow}><label>Household ID No.:</label><input type="text" className={styles.lineInput} /></div>
+          <div className={styles.formRow}><label>Region:</label><input type="text" className={styles.lineInput} /></div>
+          <div className={styles.formRow}><label>Pantawid Member?</label><input type="text" className={styles.lineInput} /></div>
+          <div className={styles.formRow}><label>Province:</label><input type="text" className={styles.lineInput} /></div>
+          <div className={styles.formRow}><label>Name of Respondent:</label><input type="text" className={styles.lineInput} /></div>
+          <div className={styles.formRow}><label>Address:</label><input type="text" className={styles.lineInput} /></div>
         </div>
 
-        <div className="section-title">CHILD WITH DISABILITY PROFILE</div>
-        <table className="profile-table">
+        <div className={styles.sectionTitle}>CHILD WITH DISABILITY PROFILE</div>
+        <table className={styles.profileTable}>
           <tbody>
-            <tr><td className="r-col">R1.</td><td className="label-col">Name:</td><td className="input-col"><input type="text" /></td><td className="code-col"></td></tr>
+            <tr><td>R1.</td><td>Name:</td><td><input type="text" /></td><td></td></tr>
             <tr><td>R2.</td><td>Address:</td><td><input type="text" /></td><td></td></tr>
             <tr><td>R3.</td><td>Contact Number:</td><td><input type="text" /></td><td></td></tr>
             <tr><td>R4.</td><td>Date of Birth:</td><td><input type="date" /></td><td></td></tr>
-            <tr><td>R5.</td><td>Religion:</td><td><input type="text" /></td><td className="code-col">Code: <input type="text" className="code-input" /></td></tr>
-            <tr><td>R6.</td><td>IP Membership:</td><td><input type="text" /></td><td className="code-col">Code: <input type="text" className="code-input" /></td></tr>
-            <tr><td>R7.</td><td>Sex:</td><td><input type="text" /></td><td className="code-col">Code: <input type="text" className="code-input" /></td></tr>
-            <tr><td>R8.</td><td>Highest Educational Attainment:</td><td><input type="text" /></td><td className="code-col">Code: <input type="text" className="code-input" /></td></tr>
-            <tr><td>R9.</td><td>Disability / Special Needs:</td><td><input type="text" /></td><td className="code-col">Code: <input type="text" className="code-input" /></td></tr>
-            <tr><td>R10.</td><td>Critical Illness:</td><td><input type="text" /></td><td className="code-col">Code: <input type="text" className="code-input" /></td></tr>
+            <tr><td>R5.</td><td>Religion:</td><td><input type="text" /></td><td>Code: <input type="text" /></td></tr>
+            <tr><td>R6.</td><td>IP Membership:</td><td><input type="text" /></td><td>Code: <input type="text" /></td></tr>
+            <tr><td>R7.</td><td>Sex:</td><td><input type="text" /></td><td>Code: <input type="text" /></td></tr>
+            <tr><td>R8.</td><td>Highest Educational Attainment:</td><td><input type="text" /></td><td>Code: <input type="text" /></td></tr>
+            <tr><td>R9.</td><td>Disability / Special Needs:</td><td><input type="text" /></td><td>Code: <input type="text" /></td></tr>
+            <tr><td>R10.</td><td>Critical Illness:</td><td><input type="text" /></td><td>Code: <input type="text" /></td></tr>
           </tbody>
         </table>
 
-        <div className="family-size">
+        <div className={styles.familySize}>
           <label>H1. Bilang ng Miyembro (Family Size):</label>
-          <input type="number" className="family-size-input" />
+          <input type="number" className={styles.familySizeInput} />
         </div>
 
-        <div className="section-title">FAMILY PROFILE</div>
-        <table className="family-table">
+        <div className={styles.sectionTitle}>FAMILY PROFILE</div>
+        <table className={styles.familyTable}>
           <thead>
             <tr>
               <th style={{ width: '40px' }}></th>
@@ -97,17 +97,17 @@ export default function ProfilePage() {
         </table>
       </div>
 
-      <div className="modal" style={{ display: showDeleteModal ? 'flex' : 'none' }}>
-        <div className="modal-box">
+      <div className={styles.modal} style={{ display: showDeleteModal ? 'flex' : 'none' }}>
+        <div className={styles.modalBox}>
           <p>Are you sure you want to<br />delete the record?</p>
-          <div className="modal-buttons">
-            <button className="yes-btn" onClick={confirmDelete}>Yes</button>
-            <button className="no-btn" onClick={() => setShowDeleteModal(false)}>No</button>
+          <div className={styles.modalButtons}>
+            <button className={styles.yesBtn} onClick={confirmDelete}>Yes</button>
+            <button className={styles.noBtn} onClick={() => setShowDeleteModal(false)}>No</button>
           </div>
         </div>
       </div>
 
-      <footer className="footer"><p>2026 CSWDO - Biñan City</p></footer>
+      <footer className={styles.footer}><p>2026 CSWDO - Biñan City</p></footer>
     </div>
   );
 }

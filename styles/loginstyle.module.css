@@ -1,44 +1,42 @@
-* { 
+/* styles/loginstyle.module.css */
+
+.loginWrapper { 
+    height: 100vh; 
+    width: 100vw;
+    background: url("/bg.jpg") no-repeat center center/cover; 
+}
+
+/* Nesting the global font-family inside the wrapper */
+.loginWrapper, .loginWrapper * {
     margin: 0; 
     padding: 0; 
     box-sizing: border-box; 
     font-family: Georgia, serif; 
 }
 
-.login-wrapper { 
-    height: 100vh; 
-    width: 100vw;
-    /* Ensure your image path is correct */
-    background: url("/bg.jpg") no-repeat center center/cover; 
-}
-
-/* Light transparent overlay */
 .overlay {
     height: 100vh;
-    width: 100vw;
-    background: rgba(255, 255, 255, 0.4); /* Lightened to match image */
+    background: rgba(255, 255, 255, 0.4);
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-/* Login Card */
-.login-card {
+.loginCard {
     width: 80%;
     max-width: 900px;
-    background: rgba(255, 255, 255, 0.95); /* Made more opaque like the image */
+    background: rgba(255, 255, 255, 0.95);
     padding: 50px 40px;
     border-radius: 12px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15); /* Softer shadow */
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     text-align: center;
 }
 
-/* Header */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px; /* More breathing room */
+    margin-bottom: 30px;
 }
 
 .logo {
@@ -46,7 +44,6 @@
     height: auto;
 }
 
-/* Center the text between the two logos */
 .title {
     flex-grow: 1;
     text-align: center;
@@ -64,51 +61,42 @@
     color: #000;
 }
 
-/* Welcome Text */
-.login-card h2 {
+.loginCard h2 {
     font-size: 22px;
     margin-bottom: 25px;
     color: #000;
 }
 
-/* Form Container */
-form {
-    width: 65%; /* Constrains the input widths */
+.loginCard form {
+    width: 65%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Centers the button */
+    align-items: center;
 }
 
-/* Inputs */
-form input {
+.loginCard input {
     width: 100%;
     padding: 14px;
     margin-bottom: 15px;
-    border: 1px solid #ccc; /* Lighter, cleaner border */
+    border: 1px solid #ccc;
     border-radius: 4px;
     font-size: 15px;
     outline: none;
 }
 
-form input::placeholder {
-    color: #888;
-}
-
-/* Button */
-button {
+.loginCard button {
     margin-top: 10px;
-    width: 50%; /* Makes button shorter than inputs, matching image */
+    width: 50%;
     padding: 14px;
     border: none;
     border-radius: 6px;
-    background: #7c4dff; /* Purple matched */
+    background: #7c4dff;
     color: white;
     font-size: 16px;
     cursor: pointer;
-    transition: background 0.3s ease;
 }
 
-button:hover {
+.loginCard button:hover {
     background: #5e35b1;
 }
