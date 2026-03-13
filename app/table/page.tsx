@@ -205,7 +205,7 @@ export default function TablePage() {
           </div>
           
           <button className={`${styles.btn} ${styles.btnSearch}`}>Search</button>
-          <button className={`${styles.btn} ${styles.btnAdd}`} onClick={() => router.push('/form')}>Add</button>
+          <button className={`${styles.btn} ${styles.btnAdd}`} onClick={() => router.push('/add-profile')}>Add</button>
           <button className={`${styles.btn} ${styles.btnSummary}`} onClick={() => router.push('/analytics')}>Summary</button>
         </div>
 
