@@ -6,8 +6,8 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import styles from '../styles/loginstyle.module.css'; 
 
-const MAX_ATTEMPTS = 5;
-const LOCK_SECONDS = 10;
+const MAX_ATTEMPTS = 3;
+const LOCK_SECONDS = 500; // 50 seconds
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -64,18 +64,25 @@ export default function LoginPage() {
         setTimeout(() => router.push('/table'), 1000);
       })
       .catch(() => {
-        attempts++;
-        localStorage.setItem("loginAttempts", attempts.toString());
-        let remaining = MAX_ATTEMPTS - attempts;
 
-        if (attempts >= MAX_ATTEMPTS) {
-          const lockUntil = Date.now() + LOCK_SECONDS * 1000;
-          localStorage.setItem("lockUntil", lockUntil.toString());
-          startCountdown(lockUntil);
-          setError("🔒 Too many failed attempts. Locked for 10 seconds.");
-        } else {
-          setError(`❌ Wrong password. Attempts remaining: ${remaining}`);
-        }
+        // Delay error message for 4 seconds
+        setTimeout(() => {
+
+          attempts++;
+          localStorage.setItem("loginAttempts", attempts.toString());
+          let remaining = MAX_ATTEMPTS - attempts;
+
+          if (attempts >= MAX_ATTEMPTS) {
+            const lockUntil = Date.now() + LOCK_SECONDS * 1000;
+            localStorage.setItem("lockUntil", lockUntil.toString());
+            startCountdown(lockUntil);
+            setError("🔒 Too many failed attempts. Locked for 10 seconds.");
+          } else {
+            setError(`❌ Wrong password. Attempts remaining: ${remaining}`);
+          }
+
+        }, 4000);
+
       });
   };
 

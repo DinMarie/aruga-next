@@ -250,7 +250,7 @@ export default function FormPage() {
           <div className={styles.question}><h4>5. What is your family’s main source of water supply?</h4></div>
           <label className={styles.radioOption}><input type="radio" name="water_supply" value="a" onChange={handleChange} /> a. Unprotected spring, lake, river, rain, dug well</label>
           <label className={styles.radioOption}><input type="radio" name="water_supply" value="b" onChange={handleChange} /> b. Commercial sources, e.g., tanker, truck, peddler</label>
-          <label className={styles.radioOption}><input type="radio" name="water_supply" value="c" onChange={handleChange} /> c. Source of safe drinking water (but > 30 mins to collect)</label>
+          <label className={styles.radioOption}><input type="radio" name="water_supply" value="c" onChange={handleChange} /> c. Source of safe drinking water (but 30 mins to collect)</label>
           <label className={styles.radioOption}><input type="radio" name="water_supply" value="d" onChange={handleChange} /> d. Own use of faucet community water system (gripo)</label>
           <label className={styles.radioOption}><input type="radio" name="water_supply" value="e" onChange={handleChange} /> e. Shared faucet community water system</label>
           <label className={styles.radioOption}><input type="radio" name="water_supply" value="f" onChange={handleChange} /> f. Own use tubed/piped deep well</label>

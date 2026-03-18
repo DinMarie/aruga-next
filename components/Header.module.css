@@ -1,19 +1,18 @@
-/* components/Header.module.css */
+/* ================= HEADER ================= */
 
 .header {
+  background-color: #a68cb0;
+  padding: 12px 25px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background-color: #8c6d8c;
-  color: white;
   border-bottom: 2px solid #8e6e9e;
-  
-  /* These keep the header locked at the top of the screen */
+
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
+  height: 80px;
   box-sizing: border-box;
   z-index: 1000;
 }
@@ -24,23 +23,33 @@
   gap: 15px;
 }
 
+/* LOGO STYLE LIKE YOUR EXAMPLE */
 .logo {
-  width: 45px;
-  height: 45px;
+  width: 50px;
+  height: 50px;
+  background: white;
+  border-radius: 50%;
+  padding: 6px;
+  object-fit: contain;
 }
 
 .title {
-  margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
+  color: #2a1b3c;
+  margin: 0;
 }
 
 .subtitle {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
   flex: 1;
   text-align: center;
+  color: #2a1b3c;
 }
+
+/* ================= DROPDOWN ================= */
 
 .dropdown {
   position: relative;
@@ -49,43 +58,111 @@
 .dropbtn {
   background: none;
   border: none;
-  color: white;
   font-size: 15px;
   cursor: pointer;
+  font-weight: 600;
+  color: #2a1b3c;
 }
 
 .dropdownContent {
   position: absolute;
   right: 0;
-  top: 30px;
-  background: white;
-  min-width: 120px;
+  top: 40px;
+  background-color: white;
+  min-width: 150px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  z-index: 1000;
+  box-shadow: 0px 8px 24px rgba(0,0,0,0.2);
+  border: 1px solid #ccc;
+  overflow: hidden;
 }
 
 .dropdownItem {
   display: block;
-  padding: 10px;
+  padding: 12px 16px;
   text-decoration: none;
-  color: #333;
+  color: black;
 }
 
 .dropdownItem:hover {
-  background-color: #f5f5f5;
-  border-radius: 8px;
+  background-color: #f1f1f1;
 }
 
 .logoutItem {
   display: block;
-  padding: 10px;
+  padding: 12px 16px;
   text-decoration: none;
-  color: red;
+  color: #d32f2f;
   border-top: 1px solid #eee;
 }
 
 .logoutItem:hover {
-  background-color: #fee;
-  border-radius: 0 0 8px 8px;
+  background-color: #ffe5e5;
+}
+
+/* ================= MODAL ================= */
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.45);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 2000;
+}
+
+.modalBox {
+  background: white;
+  padding: 40px 50px;
+  border-radius: 14px;
+  text-align: center;
+  width: 400px;
+  max-width: 90%;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+
+.modalText {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+.modalButtons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.yesBtn {
+  padding: 12px 35px;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #d32f2f;
+  color: white;
+}
+
+.yesBtn:hover {
+  opacity: 0.85;
+}
+
+.noBtn {
+  padding: 12px 35px;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  cursor: pointer;
+  background: #bbb;
+  color: white;
+}
+
+.noBtn:hover {
+  opacity: 0.85;
 }
