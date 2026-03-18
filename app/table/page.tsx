@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import Header from '../../components/Header';
-import styles from '../../styles/table.module.css';
 
 // 1. WE DEFINE ALL OUR FILTER OPTIONS HERE TO KEEP THE HTML CLEAN
 const FILTER_OPTIONS = {
@@ -40,7 +39,7 @@ export default function TablePage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const querySnapshot = await getDocs(collection(db, "Profile"));
+        const querySnapshot = await getDocs(collection(db, "profiles"));
         const dataList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ProfileData[];
         setProfiles(dataList);
       } catch (error) { console.error("Error fetching data:", error); }
@@ -66,23 +65,23 @@ export default function TablePage() {
   };
 
   return (
-    <div className={styles.tableWrapper}>
-      <div className={styles.pageContainer}>
+    <div className="tableWrapper">
+      <div className="pageContainer">
         <Header />
 
-        <div className={styles.actionBar}>
-          <div className={styles.dropdown}>
-            <button className={`${styles.btn} ${styles.btnFilter}`} onClick={() => setShowFilterMenu(!showFilterMenu)}>⚙ FILTER &#9662;</button>
-            <div className={`${styles.dropdownContent} ${showFilterMenu ? styles.show : ''}`}>
+        <div className="actionBar">
+          <div className="dropdown">
+            <button className="btn btnFilter" onClick={() => setShowFilterMenu(!showFilterMenu)}>⚙ FILTER &#9662;</button>
+            <div className={`dropdownContent ${showFilterMenu ? 'show' : ''}`}>
               
               {/* BARANGAY FILTER */}
-              <div className={styles.filterCategory}>
-                <div className={styles.categoryHeader} onClick={() => toggleCategory('barangay')}>
-                  <span>Barangay</span><span className={styles.categoryIndicator}>▼</span>
+              <div className="filterCategory">
+                <div className="categoryHeader" onClick={() => toggleCategory('barangay')}>
+                  <span>Barangay</span><span className="categoryIndicator">▼</span>
                 </div>
-                <div className={styles.categoryChecklist} style={{ display: openCategory === 'barangay' ? 'block' : 'none' }}>
+                <div className="categoryChecklist" style={{ display: openCategory === 'barangay' ? 'block' : 'none' }}>
                   {FILTER_OPTIONS.barangays.map(item => (
-                    <div className={styles.checkboxItem} key={item}>
+                    <div className="checkboxItem" key={item}>
                       <input type="checkbox" id={`brgy-${item}`} checked={selectedFilters.barangay.includes(item)} onChange={() => handleFilterChange('barangay', item)} />
                       <label htmlFor={`brgy-${item}`}>{item}</label>
                     </div>
@@ -91,13 +90,13 @@ export default function TablePage() {
               </div>
 
               {/* GENDER FILTER */}
-              <div className={styles.filterCategory}>
-                <div className={styles.categoryHeader} onClick={() => toggleCategory('gender')}>
-                  <span>Gender</span><span className={styles.categoryIndicator}>▼</span>
+              <div className="filterCategory">
+                <div className="categoryHeader" onClick={() => toggleCategory('gender')}>
+                  <span>Gender</span><span className="categoryIndicator">▼</span>
                 </div>
-                <div className={styles.categoryChecklist} style={{ display: openCategory === 'gender' ? 'block' : 'none' }}>
+                <div className="categoryChecklist" style={{ display: openCategory === 'gender' ? 'block' : 'none' }}>
                   {FILTER_OPTIONS.genders.map(item => (
-                    <div className={styles.checkboxItem} key={item}>
+                    <div className="checkboxItem" key={item}>
                       <input type="checkbox" id={`gender-${item}`} checked={selectedFilters.gender.includes(item)} onChange={() => handleFilterChange('gender', item)} />
                       <label htmlFor={`gender-${item}`}>{item}</label>
                     </div>
@@ -106,18 +105,18 @@ export default function TablePage() {
               </div>
 
               {/* RELIGION FILTER */}
-              <div className={styles.filterCategory}>
-                <div className={styles.categoryHeader} onClick={() => toggleCategory('religion')}>
-                  <span>Religion</span><span className={styles.categoryIndicator}>▼</span>
+              <div className="filterCategory">
+                <div className="categoryHeader" onClick={() => toggleCategory('religion')}>
+                  <span>Religion</span><span className="categoryIndicator">▼</span>
                 </div>
-                <div className={styles.categoryChecklist} style={{ display: openCategory === 'religion' ? 'block' : 'none' }}>
+                <div className="categoryChecklist" style={{ display: openCategory === 'religion' ? 'block' : 'none' }}>
                   {FILTER_OPTIONS.religions.map(item => (
-                    <div className={styles.checkboxItem} key={item}>
+                    <div className="checkboxItem" key={item}>
                       <input type="checkbox" id={`rel-${item}`} checked={selectedFilters.religion.includes(item)} onChange={() => handleFilterChange('religion', item)} />
                       <label htmlFor={`rel-${item}`}>{item}</label>
                     </div>
                   ))}
-                  <div className={styles.othersRow}>
+                  <div className="othersRow">
                     <input type="text" placeholder="others:" />
                     <button style={{ background: '#e0d4f0', border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '0.8rem', cursor: 'pointer' }}>➕</button>
                   </div>
@@ -125,18 +124,18 @@ export default function TablePage() {
               </div>
 
               {/* IP MEMBERSHIP */}
-              <div className={styles.filterCategory}>
-                <div className={styles.categoryHeader} onClick={() => toggleCategory('ip')}>
-                  <span>IP Membership</span><span className={styles.categoryIndicator}>▼</span>
+              <div className="filterCategory">
+                <div className="categoryHeader" onClick={() => toggleCategory('ip')}>
+                  <span>IP Membership</span><span className="categoryIndicator">▼</span>
                 </div>
-                <div className={styles.categoryChecklist} style={{ display: openCategory === 'ip' ? 'block' : 'none' }}>
+                <div className="categoryChecklist" style={{ display: openCategory === 'ip' ? 'block' : 'none' }}>
                   {FILTER_OPTIONS.ip.map(item => (
-                    <div className={styles.checkboxItem} key={item}>
+                    <div className="checkboxItem" key={item}>
                       <input type="checkbox" id={`ip-${item}`} checked={selectedFilters.ip.includes(item)} onChange={() => handleFilterChange('ip', item)} />
                       <label htmlFor={`ip-${item}`}>{item}</label>
                     </div>
                   ))}
-                  <div className={styles.othersRow}>
+                  <div className="othersRow">
                     <input type="text" placeholder="others:" />
                     <button style={{ background: '#e0d4f0', border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '0.8rem', cursor: 'pointer' }}>➕</button>
                   </div>
@@ -144,13 +143,13 @@ export default function TablePage() {
               </div>
 
               {/* EDUCATION FILTER */}
-              <div className={styles.filterCategory}>
-                <div className={styles.categoryHeader} onClick={() => toggleCategory('education')}>
-                  <span>Education</span><span className={styles.categoryIndicator}>▼</span>
+              <div className="filterCategory">
+                <div className="categoryHeader" onClick={() => toggleCategory('education')}>
+                  <span>Education</span><span className="categoryIndicator">▼</span>
                 </div>
-                <div className={styles.categoryChecklist} style={{ display: openCategory === 'education' ? 'block' : 'none' }}>
+                <div className="categoryChecklist" style={{ display: openCategory === 'education' ? 'block' : 'none' }}>
                   {FILTER_OPTIONS.education.map(item => (
-                    <div className={styles.checkboxItem} key={item}>
+                    <div className="checkboxItem" key={item}>
                       <input type="checkbox" id={`edu-${item}`} checked={selectedFilters.education.includes(item)} onChange={() => handleFilterChange('education', item)} />
                       <label htmlFor={`edu-${item}`}>{item}</label>
                     </div>
@@ -159,13 +158,13 @@ export default function TablePage() {
               </div>
 
               {/* DISABILITY FILTER */}
-              <div className={styles.filterCategory}>
-                <div className={styles.categoryHeader} onClick={() => toggleCategory('disability')}>
-                  <span>Disability / Special Needs</span><span className={styles.categoryIndicator}>▼</span>
+              <div className="filterCategory">
+                <div className="categoryHeader" onClick={() => toggleCategory('disability')}>
+                  <span>Disability / Special Needs</span><span className="categoryIndicator">▼</span>
                 </div>
-                <div className={styles.categoryChecklist} style={{ display: openCategory === 'disability' ? 'block' : 'none' }}>
+                <div className="categoryChecklist" style={{ display: openCategory === 'disability' ? 'block' : 'none' }}>
                   {FILTER_OPTIONS.disabilities.map(item => (
-                    <div className={styles.checkboxItem} key={item}>
+                    <div className="checkboxItem" key={item}>
                       <input type="checkbox" id={`dis-${item}`} checked={selectedFilters.disability.includes(item)} onChange={() => handleFilterChange('disability', item)} />
                       <label htmlFor={`dis-${item}`}>{item}</label>
                     </div>
@@ -174,43 +173,43 @@ export default function TablePage() {
               </div>
 
               {/* ILLNESS FILTER */}
-              <div className={styles.filterCategory}>
-                <div className={styles.categoryHeader} onClick={() => toggleCategory('illness')}>
-                  <span>Critical Illness</span><span className={styles.categoryIndicator}>▼</span>
+              <div className="filterCategory">
+                <div className="categoryHeader" onClick={() => toggleCategory('illness')}>
+                  <span>Critical Illness</span><span className="categoryIndicator">▼</span>
                 </div>
-                <div className={styles.categoryChecklist} style={{ display: openCategory === 'illness' ? 'block' : 'none' }}>
+                <div className="categoryChecklist" style={{ display: openCategory === 'illness' ? 'block' : 'none' }}>
                   {FILTER_OPTIONS.illnesses.map(item => (
-                    <div className={styles.checkboxItem} key={item}>
+                    <div className="checkboxItem" key={item}>
                       <input type="checkbox" id={`ill-${item}`} checked={selectedFilters.illness.includes(item)} onChange={() => handleFilterChange('illness', item)} />
                       <label htmlFor={`ill-${item}`}>{item}</label>
                     </div>
                   ))}
-                  <div className={styles.othersRow}>
+                  <div className="othersRow">
                     <input type="text" placeholder="others:" />
                     <button style={{ background: '#e0d4f0', border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '0.8rem', cursor: 'pointer' }}>➕</button>
                   </div>
                 </div>
               </div>
 
-              <div className={styles.filterFooter}>
-                <button className={styles.btnClearAll} onClick={clearAllFilters}>Clear All</button>
-                <button className={styles.btnApply} onClick={() => setShowFilterMenu(false)}>Apply</button>
+              <div className="filterFooter">
+                <button className="btnClearAll" onClick={clearAllFilters}>Clear All</button>
+                <button className="btnApply" onClick={() => setShowFilterMenu(false)}>Apply</button>
               </div>
             </div>
           </div>
 
-          <div className={styles.searchWrapper}>
-            <input type="text" className={styles.searchInput} placeholder="*FirstName / *LastName / *Barangay" />
-            <div className={styles.clearSearch}>✕</div>
+          <div className="searchWrapper">
+            <input type="text" className="searchInput" placeholder="*FirstName / *LastName / *Barangay" />
+            <div className="clearSearch">✕</div>
           </div>
           
-          <button className={`${styles.btn} ${styles.btnSearch}`}>Search</button>
-          <button className={`${styles.btn} ${styles.btnAdd}`} onClick={() => router.push('/add-profile')}>Add</button>
-          <button className={`${styles.btn} ${styles.btnSummary}`} onClick={() => router.push('/analytics')}>Summary</button>
+          <button className="btn btnSearch">Search</button>
+          <button className="btn btnAdd" onClick={() => router.push('/add-profile')}>Add</button>
+          <button className="btn btnSummary" onClick={() => router.push('/analytics')}>Summary</button>
         </div>
 
-        <div className={styles.tableArea}>
-          <div className={styles.tableTitle}>Summary of Informations</div>
+        <div className="tableArea">
+          <div className="tableTitle">Summary of Informations</div>
           <table>
             <thead>
               <tr>
@@ -229,7 +228,7 @@ export default function TablePage() {
                   return (
                     <tr key={profile.id}>
                       <td>{child.name || 'N/A'}</td><td>{formattedDOB}</td><td>{child.sex || 'N/A'}</td><td>{child.contact_number || 'N/A'}</td><td>{fullAddress}</td><td>{child.religion || 'N/A'}</td><td>{child.ip_membership || 'N/A'}</td><td>{child.disability_special_needs || 'N/A'}</td><td>{child.critical_illness || 'N/A'}</td>
-                      <td><button className={styles.checkBtn} onClick={() => router.push(`/profile?id=${profile.id}`)}>Check Information</button></td>
+                      <td><button className="checkBtn" onClick={() => router.push(`/profile?id=${profile.id}`)}>Check Information</button></td>
                     </tr>
                   );
                 })
@@ -238,13 +237,13 @@ export default function TablePage() {
           </table>
         </div>
 
-        <footer className={styles.footerControls}>
-          <button className={styles.btnPrint}>PRINT REPORT</button>
-          <div className={styles.pagination}>
-            <button className={styles.pgBtn}>&lt;</button>
-            <button className={`${styles.pgBtn} ${styles.active}`}>1</button>
-            <button className={styles.pgBtn}>2</button>
-            <button className={styles.pgBtn}>&gt;</button>
+        <footer className="footerControls">
+          <button className="btnPrint">PRINT REPORT</button>
+          <div className="pagination">
+            <button className="pgBtn">&lt;</button>
+            <button className="pgBtn active">1</button>
+            <button className="pgBtn">2</button>
+            <button className="pgBtn">&gt;</button>
           </div>
         </footer>
 

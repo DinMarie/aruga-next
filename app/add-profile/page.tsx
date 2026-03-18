@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation';
 import Header from '../../components/Header';
-import styles from '../../styles/addstyle.module.css';
 
 export default function AddProfilePage() {
   const router = useRouter();
@@ -14,68 +13,68 @@ export default function AddProfilePage() {
   };
 
   return (
-    <div className={styles.addWrapper}>
+    <div className="addWrapper">
       <Header subtitle="Aruga Project Profiling and Assessment Details" />
 
-      <div className={styles.backButton}>
+      <div className="backButton">
         <button onClick={() => router.push('/table')}>← Back</button>
       </div>
 
-      <div className={styles.container}>
+      <div className="container">
         
         {/* TOP ROW */}
-        <div className={styles.topRow}>
-          <div className={styles.fieldGroup}>
+        <div className="topRow">
+          <div className="fieldGroup">
             <label>Date of Interview:</label>
             <input type="date" id="dateInterview" />
           </div>
-          <div className={styles.fieldGroup}>
+          <div className="fieldGroup">
             <label>Time Started:</label>
             <input type="time" id="timeStart" />
           </div>
-          <div className={styles.fieldGroup}>
+          <div className="fieldGroup">
             <label>Time Ended:</label>
             <input type="time" id="timeEnd" />
           </div>
         </div>
 
         {/* INFO SECTION */}
-        <div className={styles.infoSection}>
-          <div className={styles.formRow}><label>Name of Interviewer:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Household ID No.:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Region:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Pantawid Member?</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Province:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Name of Respondent:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Address:</label><input type="text" className={styles.lineInput} /></div>
+        <div className="infoSection">
+          <div className="formRow"><label>Name of Interviewer:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Household ID No.:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Region:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Pantawid Member?</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Province:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Name of Respondent:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Address:</label><input type="text" className="lineInput" /></div>
         </div>
 
         {/* CHILD PROFILE TABLE */}
-        <div className={styles.sectionTitle}>CHILD WITH DISABILITY PROFILE</div>
-        <table className={styles.profileTable}>
+        <div className="sectionTitle">CHILD WITH DISABILITY PROFILE</div>
+        <table className="profileTable">
           <tbody>
-            <tr><td className={styles.rCol}>R1.</td><td className={styles.labelCol}>Name:</td><td><input type="text" /></td></tr>
-            <tr><td className={styles.rCol}>R2.</td><td className={styles.labelCol}>Address:</td><td><input type="text" /></td></tr>
-            <tr><td className={styles.rCol}>R3.</td><td className={styles.labelCol}>Contact Number:</td><td><input type="text" /></td></tr>
-            <tr><td className={styles.rCol}>R4.</td><td className={styles.labelCol}>Date of Birth:</td><td><input type="date" /></td></tr>
-            <tr><td className={styles.rCol}>R5.</td><td className={styles.labelCol}>Religion:</td><td><input type="text" /></td><td className={styles.codeCol}>Code: <input type="text" className={styles.codeInput} /></td></tr>
-            <tr><td className={styles.rCol}>R6.</td><td className={styles.labelCol}>IP Membership:</td><td><input type="text" /></td><td className={styles.codeCol}>Code: <input type="text" className={styles.codeInput} /></td></tr>
-            <tr><td className={styles.rCol}>R7.</td><td className={styles.labelCol}>Sex:</td><td><input type="text" /></td><td className={styles.codeCol}>Code: <input type="text" className={styles.codeInput} /></td></tr>
-            <tr><td className={styles.rCol}>R8.</td><td className={styles.labelCol}>Highest Educational Attainment:</td><td><input type="text" /></td><td className={styles.codeCol}>Code: <input type="text" className={styles.codeInput} /></td></tr>
-            <tr><td className={styles.rCol}>R9.</td><td className={styles.labelCol}>Disability / Special Needs:</td><td><input type="text" /></td><td className={styles.codeCol}>Code: <input type="text" className={styles.codeInput} /></td></tr>
-            <tr><td className={styles.rCol}>R10.</td><td className={styles.labelCol}>Critical Illness:</td><td><input type="text" /></td><td className={styles.codeCol}>Code: <input type="text" className={styles.codeInput} /></td></tr>
+            <tr><td className="rCol">R1.</td><td className="labelCol">Name:</td><td><input type="text" /></td></tr>
+            <tr><td className="rCol">R2.</td><td className="labelCol">Address:</td><td><input type="text" /></td></tr>
+            <tr><td className="rCol">R3.</td><td className="labelCol">Contact Number:</td><td><input type="text" /></td></tr>
+            <tr><td className="rCol">R4.</td><td className="labelCol">Date of Birth:</td><td><input type="date" /></td></tr>
+            <tr><td className="rCol">R5.</td><td className="labelCol">Religion:</td><td><input type="text" /></td><td className="codeCol">Code: <input type="text" className="codeInput" /></td></tr>
+            <tr><td className="rCol">R6.</td><td className="labelCol">IP Membership:</td><td><input type="text" /></td><td className="codeCol">Code: <input type="text" className="codeInput" /></td></tr>
+            <tr><td className="rCol">R7.</td><td className="labelCol">Sex:</td><td><input type="text" /></td><td className="codeCol">Code: <input type="text" className="codeInput" /></td></tr>
+            <tr><td className="rCol">R8.</td><td className="labelCol">Highest Educational Attainment:</td><td><input type="text" /></td><td className="codeCol">Code: <input type="text" className="codeInput" /></td></tr>
+            <tr><td className="rCol">R9.</td><td className="labelCol">Disability / Special Needs:</td><td><input type="text" /></td><td className="codeCol">Code: <input type="text" className="codeInput" /></td></tr>
+            <tr><td className="rCol">R10.</td><td className="labelCol">Critical Illness:</td><td><input type="text" /></td><td className="codeCol">Code: <input type="text" className="codeInput" /></td></tr>
           </tbody>
         </table>
 
         {/* FAMILY SIZE */}
-        <div className={styles.familySize}>
+        <div className="familySize">
           <label>H1. Bilang ng Miyembro (Family Size):</label>
-          <input type="number" className={styles.familySizeInput} />
+          <input type="number" className="familySizeInput" />
         </div>
 
         {/* FAMILY PROFILE TABLE */}
-        <div className={styles.sectionTitle}>FAMILY PROFILE</div>
-        <table className={styles.familyTable}>
+        <div className="sectionTitle">FAMILY PROFILE</div>
+        <table className="familyTable">
           <thead>
             <tr>
               <th style={{ width: '40px' }}></th>
@@ -112,13 +111,13 @@ export default function AddProfilePage() {
         </table>
 
         {/* NEXT BUTTON */}
-        <div className={styles.nextContainer}>
-          <button className={styles.nextBtn} onClick={handleNext}>NEXT</button>
+        <div className="nextContainer">
+          <button className="nextBtn" onClick={handleNext}>NEXT</button>
         </div>
 
       </div>
 
-      <footer className={styles.footer}>
+      <footer className="footer">
         <p>2026 CSWDO - Biñan City</p>
       </footer>
     </div>

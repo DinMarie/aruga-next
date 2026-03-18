@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import styles from './Header.module.css';
 
 interface HeaderProps {
   subtitle?: string;
@@ -21,40 +20,40 @@ export default function Header({ subtitle, username }: HeaderProps) {
 
   return (
     <>
-      <div className={styles.header}>
+      <div className="header">
         
         {/* LEFT SIDE */}
-        <div className={styles.headerLeft}>
-          <img src="/cswd.png" alt="CSWD Logo" className={styles.logo} />
-          <h2 className={styles.title}>CSWDO - Biñan City</h2>
+        <div className="headerLeft">
+          <img src="/cswd.png" alt="CSWD Logo" className="logo" />
+          <h2 className="title">CSWDO - Biñan City</h2>
         </div>
 
         {/* MIDDLE */}
         {subtitle && (
-          <h3 className={styles.subtitle}>
+          <h3 className="subtitle">
             {subtitle}
           </h3>
         )}
 
         {/* RIGHT SIDE */}
-        <div className={styles.dropdown}>
+        <div className="dropdown">
           <button
-            className={styles.dropbtn}
+            className="dropbtn"
             onClick={() => setShowMenu(!showMenu)}
           >
             {username || "Username"} ▼
           </button>
 
           {showMenu && (
-            <div className={styles.dropdownContent}>
+            <div className="dropdownContent">
 
-              <a href="#" className={styles.dropdownItem}>
+              <a href="#" className="dropdownItem">
                 Profile
               </a>
 
               <a
                 href="#"
-                className={styles.logoutItem}
+                className="logoutItem"
                 onClick={(e) => {
                   e.preventDefault();
                   setShowMenu(false);
@@ -72,24 +71,24 @@ export default function Header({ subtitle, username }: HeaderProps) {
 
       {/* LOGOUT MODAL */}
       {showLogoutModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modalBox}>
+        <div className="modalOverlay">
+          <div className="modalBox">
 
-            <p className={styles.modalText}>
+            <p className="modalText">
               Are you sure you want to logout?
             </p>
 
-            <div className={styles.modalButtons}>
+            <div className="modalButtons">
 
               <button
-                className={styles.yesBtn}
+                className="yesBtn"
                 onClick={handleLogout}
               >
                 YES
               </button>
 
               <button
-                className={styles.noBtn}
+                className="noBtn"
                 onClick={() => setShowLogoutModal(false)}
               >
                 NO

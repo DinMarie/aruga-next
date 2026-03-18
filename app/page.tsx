@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
-import styles from '../styles/loginstyle.module.css'; 
 
 const MAX_ATTEMPTS = 3;
 const LOCK_SECONDS = 500; // 50 seconds
@@ -87,16 +86,16 @@ export default function LoginPage() {
   };
 
   return (
-    <div className={styles.loginWrapper}>
-      <div className={styles.overlay}>
-        <div className={styles.loginCard}>
-          <div className={styles.header}>
-            <img src="/logo1.png" className={styles.logo} alt="City Logo" />
-            <div className={styles.title}>
+    <div className="loginWrapper">
+      <div className="overlay">
+        <div className="loginCard">
+          <div className="header">
+            <img src="/logo1.png" className="logo" alt="City Logo" />
+            <div className="title">
               <h1>City Social Welfare and Development Office</h1>
               <p>City of Biñan</p>
             </div>
-            <img src="/cswd.png" className={styles.logo} alt="CSWD Logo" />
+            <img src="/cswd.png" className="logo" alt="CSWD Logo" />
           </div>
 
           <h2>Welcome Back!</h2>

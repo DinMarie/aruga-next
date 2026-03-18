@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Header from '../../components/Header';
-import styles from '../../styles/analyticsStyleSheet.module.css';
 
 // Reusing the same arrays here for the analytics filters
 const FILTER_OPTIONS = {
@@ -43,34 +42,34 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className={styles.analyticsWrapper}>
-      <div className={styles.pageContainer}>
+    <div className="analyticsWrapper">
+      <div className="pageContainer">
         <Header />
 
-        <div className={styles.actionBar}>
-          <button className={`${styles.btn} ${styles.btnFilter}`} onClick={() => router.push('/table')}>
-            <img src="/back.png" alt="back" className={styles.backIcon} />
+        <div className="actionBar">
+          <button className="btn btnFilter" onClick={() => router.push('/table')}>
+            <img src="/back.png" alt="back" className="backIcon" />
           </button>
-          <div className={styles.dropdown}>
-            <button className={`${styles.btn} ${styles.btnPaper}`} onClick={() => setShowPaperDropdown(!showPaperDropdown)}>A4 Paper</button>
-            <div className={`${styles.paperChoiceDropdown} ${showPaperDropdown ? styles.show : ''}`}>
+          <div className="dropdown">
+            <button className="btn btnPaper" onClick={() => setShowPaperDropdown(!showPaperDropdown)}>A4 Paper</button>
+            <div className={`paperChoiceDropdown ${showPaperDropdown ? 'show' : ''}`}>
               <a href="#">A4 Paper</a>
               <a href="#">Legal Paper</a>
               <a href="#">Letter Paper</a>
             </div>
           </div>
-          <button className={`${styles.btn} ${styles.btnPrint}`}>Print Report</button>
+          <button className="btn btnPrint">Print Report</button>
         </div>
 
-        <div className={styles.mainPaperContainer}>
-          <div className={styles.analyticsPaperContainer}>
-            <div className={styles.analyticsPaper}>
+        <div className="mainPaperContainer">
+          <div className="analyticsPaperContainer">
+            <div className="analyticsPaper">
               <h2>Analytics Paper</h2>
               <p>Content for the analytics paper goes here.</p>
               
-              <div className={styles.pieGraphContainer}>
+              <div className="pieGraphContainer">
                 <h2 style={{ marginBottom: '20px', fontSize: '20px', marginLeft: '25px' }}>Overall Result</h2>
-                <div className={styles.piechartMainContainer}>
+                <div className="piechartMainContainer">
                   <table>
                     <thead>
                       <tr>
@@ -88,35 +87,35 @@ export default function AnalyticsPage() {
                 </div>
               </div>
 
-              <div className={styles.pieGraphContainer}>
+              <div className="pieGraphContainer">
                 <h2 style={{ marginBottom: '20px', fontSize: '20px', marginLeft: '25px' }}>Religion</h2>
-                <div className={styles.piechartMainContainer}>
-                  <div className={styles.pieChart}></div>
-                  <div className={styles.chartLegend}>
-                    <div className={styles.legendItem}><span className={styles.dot} style={{ backgroundColor: '#FF6384' }}></span><span className={styles.labelText}>Catholic (20)</span></div>
-                    <div className={styles.legendItem}><span className={styles.dot} style={{ backgroundColor: '#36A2EB' }}></span><span className={styles.labelText}>Islam (20)</span></div>
-                    <div className={styles.legendItem}><span className={styles.dot} style={{ backgroundColor: '#FFCE56' }}></span><span className={styles.labelText}>INC (20)</span></div>
+                <div className="piechartMainContainer">
+                  <div className="pieChart"></div>
+                  <div className="chartLegend">
+                    <div className="legendItem"><span className="dot" style={{ backgroundColor: '#FF6384' }}></span><span className="labelText">Catholic (20)</span></div>
+                    <div className="legendItem"><span className="dot" style={{ backgroundColor: '#36A2EB' }}></span><span className="labelText">Islam (20)</span></div>
+                    <div className="legendItem"><span className="dot" style={{ backgroundColor: '#FFCE56' }}></span><span className="labelText">INC (20)</span></div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className={`${styles.filterGroupContainer} ${!isFilterOpen ? styles.closed : ''}`}>
-            <div className={styles.filterHeaderIcons}>
-              <button className={`${styles.btn} ${styles.btnFilter}`} onClick={() => setIsFilterOpen(!isFilterOpen)} style={{ backgroundColor: '#512da8', color: 'white' }}>
+          <div className={`filterGroupContainer ${!isFilterOpen ? 'closed' : ''}`}>
+            <div className="filterHeaderIcons">
+              <button className="btn btnFilter" onClick={() => setIsFilterOpen(!isFilterOpen)} style={{ backgroundColor: '#512da8', color: 'white' }}>
                 <span style={{ fontSize: '15px' }}>⚙ FILTER</span>
               </button>
             </div>
 
             {/* GENDER FILTER */}
-            <div className={`${styles.filterCategory} ${openCategory === 'gender' ? styles.active : ''}`}>
-              <div className={styles.categoryHeader} onClick={() => toggleCategory('gender')}>
-                <span>Gender</span><span className={styles.categoryIndicator}>▼</span>
+            <div className={`filterCategory ${openCategory === 'gender' ? 'active' : ''}`}>
+              <div className="categoryHeader" onClick={() => toggleCategory('gender')}>
+                <span>Gender</span><span className="categoryIndicator">▼</span>
               </div>
-              <div className={styles.categoryChecklist}>
+              <div className="categoryChecklist">
                 {FILTER_OPTIONS.genders.map(item => (
-                  <div className={styles.checkboxItem} key={item}>
+                  <div className="checkboxItem" key={item}>
                     <input type="checkbox" id={`a-gender-${item}`} checked={selectedFilters.gender.includes(item)} onChange={() => handleFilterChange('gender', item)} />
                     <label htmlFor={`a-gender-${item}`}>{item}</label>
                   </div>
@@ -125,13 +124,13 @@ export default function AnalyticsPage() {
             </div>
 
             {/* BARANGAY FILTER */}
-            <div className={`${styles.filterCategory} ${openCategory === 'barangay' ? styles.active : ''}`}>
-              <div className={styles.categoryHeader} onClick={() => toggleCategory('barangay')}>
-                <span>Barangay</span><span className={styles.categoryIndicator}>▼</span>
+            <div className={`filterCategory ${openCategory === 'barangay' ? 'active' : ''}`}>
+              <div className="categoryHeader" onClick={() => toggleCategory('barangay')}>
+                <span>Barangay</span><span className="categoryIndicator">▼</span>
               </div>
-              <div className={styles.categoryChecklist}>
+              <div className="categoryChecklist">
                 {FILTER_OPTIONS.barangays.map(item => (
-                  <div className={styles.checkboxItem} key={item}>
+                  <div className="checkboxItem" key={item}>
                     <input type="checkbox" id={`a-brgy-${item}`} checked={selectedFilters.barangay.includes(item)} onChange={() => handleFilterChange('barangay', item)} />
                     <label htmlFor={`a-brgy-${item}`}>{item}</label>
                   </div>
@@ -140,13 +139,13 @@ export default function AnalyticsPage() {
             </div>
 
             {/* RELIGION FILTER */}
-            <div className={`${styles.filterCategory} ${openCategory === 'religion' ? styles.active : ''}`}>
-              <div className={styles.categoryHeader} onClick={() => toggleCategory('religion')}>
-                <span>Religion</span><span className={styles.categoryIndicator}>▼</span>
+            <div className={`filterCategory ${openCategory === 'religion' ? 'active' : ''}`}>
+              <div className="categoryHeader" onClick={() => toggleCategory('religion')}>
+                <span>Religion</span><span className="categoryIndicator">▼</span>
               </div>
-              <div className={styles.categoryChecklist}>
+              <div className="categoryChecklist">
                 {FILTER_OPTIONS.religions.map(item => (
-                  <div className={styles.checkboxItem} key={item}>
+                  <div className="checkboxItem" key={item}>
                     <input type="checkbox" id={`a-rel-${item}`} checked={selectedFilters.religion.includes(item)} onChange={() => handleFilterChange('religion', item)} />
                     <label htmlFor={`a-rel-${item}`}>{item}</label>
                   </div>
@@ -155,13 +154,13 @@ export default function AnalyticsPage() {
             </div>
 
             {/* DISABILITY FILTER */}
-            <div className={`${styles.filterCategory} ${openCategory === 'disability' ? styles.active : ''}`}>
-              <div className={styles.categoryHeader} onClick={() => toggleCategory('disability')}>
-                <span>Disability/Special Needs</span><span className={styles.categoryIndicator}>▼</span>
+            <div className={`filterCategory ${openCategory === 'disability' ? 'active' : ''}`}>
+              <div className="categoryHeader" onClick={() => toggleCategory('disability')}>
+                <span>Disability/Special Needs</span><span className="categoryIndicator">▼</span>
               </div>
-              <div className={styles.categoryChecklist}>
+              <div className="categoryChecklist">
                 {FILTER_OPTIONS.disabilities.map(item => (
-                  <div className={styles.checkboxItem} key={item}>
+                  <div className="checkboxItem" key={item}>
                     <input type="checkbox" id={`a-dis-${item}`} checked={selectedFilters.disability.includes(item)} onChange={() => handleFilterChange('disability', item)} />
                     <label htmlFor={`a-dis-${item}`}>{item}</label>
                   </div>
@@ -170,13 +169,13 @@ export default function AnalyticsPage() {
             </div>
 
             {/* ILLNESS FILTER */}
-            <div className={`${styles.filterCategory} ${openCategory === 'illness' ? styles.active : ''}`}>
-              <div className={styles.categoryHeader} onClick={() => toggleCategory('illness')}>
-                <span>Critical Illness</span><span className={styles.categoryIndicator}>▼</span>
+            <div className={`filterCategory ${openCategory === 'illness' ? 'active' : ''}`}>
+              <div className="categoryHeader" onClick={() => toggleCategory('illness')}>
+                <span>Critical Illness</span><span className="categoryIndicator">▼</span>
               </div>
-              <div className={styles.categoryChecklist}>
+              <div className="categoryChecklist">
                 {FILTER_OPTIONS.illnesses.map(item => (
-                  <div className={styles.checkboxItem} key={item}>
+                  <div className="checkboxItem" key={item}>
                     <input type="checkbox" id={`a-ill-${item}`} checked={selectedFilters.illness.includes(item)} onChange={() => handleFilterChange('illness', item)} />
                     <label htmlFor={`a-ill-${item}`}>{item}</label>
                   </div>
@@ -185,13 +184,13 @@ export default function AnalyticsPage() {
             </div>
 
             {/* IP FILTER */}
-            <div className={`${styles.filterCategory} ${openCategory === 'ip' ? styles.active : ''}`}>
-              <div className={styles.categoryHeader} onClick={() => toggleCategory('ip')}>
-                <span>IP Membership</span><span className={styles.categoryIndicator}>▼</span>
+            <div className={`filterCategory ${openCategory === 'ip' ? 'active' : ''}`}>
+              <div className="categoryHeader" onClick={() => toggleCategory('ip')}>
+                <span>IP Membership</span><span className="categoryIndicator">▼</span>
               </div>
-              <div className={styles.categoryChecklist}>
+              <div className="categoryChecklist">
                 {FILTER_OPTIONS.ip.map(item => (
-                  <div className={styles.checkboxItem} key={item}>
+                  <div className="checkboxItem" key={item}>
                     <input type="checkbox" id={`a-ip-${item}`} checked={selectedFilters.ip.includes(item)} onChange={() => handleFilterChange('ip', item)} />
                     <label htmlFor={`a-ip-${item}`}>{item}</label>
                   </div>
@@ -199,9 +198,9 @@ export default function AnalyticsPage() {
               </div>
             </div>
 
-            <div className={styles.filterFooter}>
-              <button className={styles.btnClearAll} onClick={clearAllFilters}>Clear All</button>
-              <button className={styles.btnApply} onClick={() => setIsFilterOpen(false)}>Apply</button>
+            <div className="filterFooter">
+              <button className="btnClearAll" onClick={clearAllFilters}>Clear All</button>
+              <button className="btnApply" onClick={() => setIsFilterOpen(false)}>Apply</button>
             </div> 
 
           </div>

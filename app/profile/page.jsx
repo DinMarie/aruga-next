@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Header from '../../components/Header';
-import styles from '../../styles/profilestyle.module.css';
 
 export default function ProfilePage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -14,33 +13,33 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className={styles.profileWrapper}>
+    <div className="profileWrapper">
       <Header subtitle="Aruga Project Profiling and Assessment Details" />
 
-      <div className={styles.container} style={{ marginTop: '90px' }}>
-        <div className={styles.containerRight}>
-          <button className={styles.updateBtn} onClick={handleSave}>UPDATE</button>
-          <button className={styles.deleteBtn} onClick={() => setShowDeleteModal(true)}>DELETE</button>
+      <div className="container" style={{ marginTop: '90px' }}>
+        <div className="containerRight">
+          <button className="updateBtn" onClick={handleSave}>UPDATE</button>
+          <button className="deleteBtn" onClick={() => setShowDeleteModal(true)}>DELETE</button>
         </div>
 
-        <div className={styles.topRow}>
-          <div className={styles.fieldGroup}><label>Date of Interview:</label><input type="date" id="dateInterview" /></div>
-          <div className={styles.fieldGroup}><label>Time Started:</label><input type="time" id="timeStart" /></div>
-          <div className={styles.fieldGroup}><label>Time Ended:</label><input type="time" id="timeEnd" /></div>
+        <div className="topRow">
+          <div className="fieldGroup"><label>Date of Interview:</label><input type="date" id="dateInterview" /></div>
+          <div className="fieldGroup"><label>Time Started:</label><input type="time" id="timeStart" /></div>
+          <div className="fieldGroup"><label>Time Ended:</label><input type="time" id="timeEnd" /></div>
         </div>
 
-        <div className={styles.infoSection}>
-          <div className={styles.formRow}><label>Name of Interviewer:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Household ID No.:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Region:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Pantawid Member?</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Province:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Name of Respondent:</label><input type="text" className={styles.lineInput} /></div>
-          <div className={styles.formRow}><label>Address:</label><input type="text" className={styles.lineInput} /></div>
+        <div className="infoSection">
+          <div className="formRow"><label>Name of Interviewer:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Household ID No.:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Region:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Pantawid Member?</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Province:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Name of Respondent:</label><input type="text" className="lineInput" /></div>
+          <div className="formRow"><label>Address:</label><input type="text" className="lineInput" /></div>
         </div>
 
-        <div className={styles.sectionTitle}>CHILD WITH DISABILITY PROFILE</div>
-        <table className={styles.profileTable}>
+        <div className="sectionTitle">CHILD WITH DISABILITY PROFILE</div>
+        <table className="profileTable">
           <tbody>
             <tr><td>R1.</td><td>Name:</td><td><input type="text" /></td><td></td></tr>
             <tr><td>R2.</td><td>Address:</td><td><input type="text" /></td><td></td></tr>
@@ -55,13 +54,13 @@ export default function ProfilePage() {
           </tbody>
         </table>
 
-        <div className={styles.familySize}>
+        <div className="familySize">
           <label>H1. Bilang ng Miyembro (Family Size):</label>
-          <input type="number" className={styles.familySizeInput} />
+          <input type="number" className="familySizeInput" />
         </div>
 
-        <div className={styles.sectionTitle}>FAMILY PROFILE</div>
-        <table className={styles.familyTable}>
+        <div className="sectionTitle">FAMILY PROFILE</div>
+        <table className="familyTable">
           <thead>
             <tr>
               <th style={{ width: '40px' }}></th>
@@ -97,17 +96,17 @@ export default function ProfilePage() {
         </table>
       </div>
 
-      <div className={styles.modal} style={{ display: showDeleteModal ? 'flex' : 'none' }}>
-        <div className={styles.modalBox}>
+      <div className="modal" style={{ display: showDeleteModal ? 'flex' : 'none' }}>
+        <div className="modalBox">
           <p>Are you sure you want to<br />delete the record?</p>
-          <div className={styles.modalButtons}>
-            <button className={styles.yesBtn} onClick={confirmDelete}>Yes</button>
-            <button className={styles.noBtn} onClick={() => setShowDeleteModal(false)}>No</button>
+          <div className="modalButtons">
+            <button className="yesBtn" onClick={confirmDelete}>Yes</button>
+            <button className="noBtn" onClick={() => setShowDeleteModal(false)}>No</button>
           </div>
         </div>
       </div>
 
-      <footer className={styles.footer}><p>2026 CSWDO - Biñan City</p></footer>
+      <footer className="footer"><p>2026 CSWDO - Biñan City</p></footer>
     </div>
   );
 }
