@@ -5,24 +5,31 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import Header from '../../components/Header';
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../../lib/firebase";
 
-// 1. WE DEFINE ALL OUR FILTER OPTIONS HERE TO KEEP THE HTML CLEAN
+// 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
   barangays: ["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mamplasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-soro", "Timbao", "Tubigan", "Zapote"],
   genders: ["Female", "Male"],
   religions: ["None", "Aglipay", "Roman Catholic", "Seventh Day Adventist", "Islam", "Bible Baptist Church", "Iglesia ni Cristo", "Jehovah's Witness", "United Methodists Church", "Tribal Religions"],
   ip: ["Non-IP", "Aeta", "Ati", "Badjao", "Bago", "Batak", "Bukidnon", "B'laan", "Cimaron", "Cayonen", "Dumagat", "Ibaloi", "Ibanag", "Itom", "Kankanaey", "Mandaya", "Mangyan", "Manobo", "Palawano", "Pullon", "Subanen"],
-  education: ["Without Formal Education", "Elementary", "Elementary Graduate", "High School", "High School Graduate", "Vocational Course", "Voc. Course Graduate", "College", "College Graduate", "Post College Degree"],
   disabilities: ["None", "Physical", "Intellectual", "Learning", "Visual", "Mental", "Psychosocial", "Deaf/Hard of Hearing", "Speech and Language Impairment", "Cancer", "Rare Disease"],
   illnesses: ["None", "Cancer", "Cardio-vascular Disease", "Paralysis", "Organ Failure"]
 };
 
+// 2. UPDATED INTERFACE
 interface ProfileData {
   id: string;
-  barangay?: string;
-  child_profile?: {
-    name?: string; sex?: string; contact_number?: string; religion?: string; ip_membership?: string; disability_special_needs?: string; critical_illness?: string; date_of_birth?: any; 
-  };
+  name?: string;
+  birthday?: string;
+  sex?: string;
+  contact?: string;
+  address?: string;
+  religion?: string;
+  ip?: string;
+  disability?: string;
+  illness?: string;
 }
 
 export default function TablePage() {
@@ -31,10 +38,15 @@ export default function TablePage() {
   const [openCategory, setOpenCategory] = useState<string | null>(null);
   const router = useRouter();
 
-  // 2. THIS STATE TRACKS EVERYTHING THE USER CHECKED
+  // --- SEARCH, FILTER & PAGINATION STATES ---
+  const [searchTerm, setSearchTerm] = useState(""); 
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({
-    barangay: [], gender: [], religion: [], ip: [], education: [], disability: [], illness: []
+    barangay: [], gender: [], religion: [], ip: [], disability: [], illness: []
   });
+  
+  // NEW: Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10; // Change this number to show more/less rows per page
 
   useEffect(() => {
     async function fetchData() {
@@ -47,22 +59,56 @@ export default function TablePage() {
     fetchData();
   }, []);
 
+  // NEW: Reset to page 1 whenever search or filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedFilters]);
+
   const toggleCategory = (categoryName: string) => setOpenCategory(openCategory === categoryName ? null : categoryName);
 
-  // 3. THIS FUNCTION ADDS/REMOVES ITEMS FROM THE FILTER STATE WHEN CLICKED
   const handleFilterChange = (category: string, value: string) => {
     setSelectedFilters(prev => {
       const currentList = prev[category] || [];
       if (currentList.includes(value)) {
-        return { ...prev, [category]: currentList.filter(item => item !== value) }; // Remove if unchecked
+        return { ...prev, [category]: currentList.filter(item => item !== value) };
       }
-      return { ...prev, [category]: [...currentList, value] }; // Add if checked
+      return { ...prev, [category]: [...currentList, value] };
     });
   };
 
   const clearAllFilters = () => {
-    setSelectedFilters({ barangay: [], gender: [], religion: [], ip: [], education: [], disability: [], illness: [] });
+    setSelectedFilters({ barangay: [], gender: [], religion: [], ip: [], disability: [], illness: [] });
   };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+  };
+
+  // --- FILTER LOGIC ---
+  const displayedProfiles = profiles.filter(profile => {
+    let matchSearch = true;
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      const matchName = profile.name?.toLowerCase().includes(term);
+      const matchAddress = profile.address?.toLowerCase().includes(term);
+      matchSearch = !!(matchName || matchAddress);
+    }
+
+    const matchBarangay = selectedFilters.barangay.length === 0 || selectedFilters.barangay.some(b => profile.address?.includes(b));
+    const matchGender = selectedFilters.gender.length === 0 || selectedFilters.gender.includes(profile.sex || "");
+    const matchReligion = selectedFilters.religion.length === 0 || selectedFilters.religion.includes(profile.religion || "");
+    const matchIp = selectedFilters.ip.length === 0 || selectedFilters.ip.includes(profile.ip || "");
+    const matchDisability = selectedFilters.disability.length === 0 || selectedFilters.disability.includes(profile.disability || "");
+    const matchIllness = selectedFilters.illness.length === 0 || selectedFilters.illness.includes(profile.illness || "");
+
+    return matchSearch && matchBarangay && matchGender && matchReligion && matchIp && matchDisability && matchIllness;
+  });
+
+  // --- NEW: PAGINATION LOGIC ---
+  const totalPages = Math.max(1, Math.ceil(displayedProfiles.length / ITEMS_PER_PAGE));
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  // Slice the filtered array to only get the items for the current page
+  const paginatedProfiles = displayedProfiles.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <div className="tableWrapper">
@@ -116,10 +162,6 @@ export default function TablePage() {
                       <label htmlFor={`rel-${item}`}>{item}</label>
                     </div>
                   ))}
-                  <div className="othersRow">
-                    <input type="text" placeholder="others:" />
-                    <button style={{ background: '#e0d4f0', border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '0.8rem', cursor: 'pointer' }}>➕</button>
-                  </div>
                 </div>
               </div>
 
@@ -133,25 +175,6 @@ export default function TablePage() {
                     <div className="checkboxItem" key={item}>
                       <input type="checkbox" id={`ip-${item}`} checked={selectedFilters.ip.includes(item)} onChange={() => handleFilterChange('ip', item)} />
                       <label htmlFor={`ip-${item}`}>{item}</label>
-                    </div>
-                  ))}
-                  <div className="othersRow">
-                    <input type="text" placeholder="others:" />
-                    <button style={{ background: '#e0d4f0', border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '0.8rem', cursor: 'pointer' }}>➕</button>
-                  </div>
-                </div>
-              </div>
-
-              {/* EDUCATION FILTER */}
-              <div className="filterCategory">
-                <div className="categoryHeader" onClick={() => toggleCategory('education')}>
-                  <span>Education</span><span className="categoryIndicator">▼</span>
-                </div>
-                <div className="categoryChecklist" style={{ display: openCategory === 'education' ? 'block' : 'none' }}>
-                  {FILTER_OPTIONS.education.map(item => (
-                    <div className="checkboxItem" key={item}>
-                      <input type="checkbox" id={`edu-${item}`} checked={selectedFilters.education.includes(item)} onChange={() => handleFilterChange('education', item)} />
-                      <label htmlFor={`edu-${item}`}>{item}</label>
                     </div>
                   ))}
                 </div>
@@ -184,10 +207,6 @@ export default function TablePage() {
                       <label htmlFor={`ill-${item}`}>{item}</label>
                     </div>
                   ))}
-                  <div className="othersRow">
-                    <input type="text" placeholder="others:" />
-                    <button style={{ background: '#e0d4f0', border: 'none', borderRadius: '20px', padding: '5px 12px', fontSize: '0.8rem', cursor: 'pointer' }}>➕</button>
-                  </div>
                 </div>
               </div>
 
@@ -199,8 +218,14 @@ export default function TablePage() {
           </div>
 
           <div className="searchWrapper">
-            <input type="text" className="searchInput" placeholder="*FirstName / *LastName / *Barangay" />
-            <div className="clearSearch">✕</div>
+            <input 
+              type="text" 
+              className="searchInput" 
+              placeholder="*FirstName / *LastName / *Barangay" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {searchTerm && <div className="clearSearch" onClick={handleClearSearch}>✕</div>}
           </div>
           
           <button className="btn btnSearch">Search</button>
@@ -213,21 +238,35 @@ export default function TablePage() {
           <table>
             <thead>
               <tr>
-                <th>Name</th><th>Birthday</th><th>Sex</th><th>Contact Number</th><th>Address</th><th>Religion</th><th>IP Membership</th><th>Disability / Special Needs</th><th>Critical Illness</th><th>Action</th>
+                <th>Name</th>
+                <th>Birthday</th>
+                <th>Sex</th>
+                <th>Contact Number</th>
+                <th>Address</th>
+                <th>Religion</th>
+                <th>IP Membership</th>
+                <th>Disability / Special Needs</th>
+                <th>Critical Illness</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {profiles.length === 0 ? (
-                <tr><td colSpan={10} style={{ textAlign: 'center' }}>Loading data...</td></tr>
+              {/* BINAGO: Render paginatedProfiles instead of displayedProfiles */}
+              {paginatedProfiles.length === 0 ? (
+                <tr><td colSpan={10} style={{ textAlign: 'center', padding: '20px' }}>No records found matching your filters.</td></tr>
               ) : (
-                profiles.map((profile) => {
-                  const child = profile.child_profile || {};
-                  const fullAddress = profile.barangay || 'N/A';
-                  let formattedDOB = 'N/A';
-                  if (child.date_of_birth && typeof child.date_of_birth.toDate === 'function') formattedDOB = child.date_of_birth.toDate().toLocaleDateString();
+                paginatedProfiles.map((profile) => {
                   return (
                     <tr key={profile.id}>
-                      <td>{child.name || 'N/A'}</td><td>{formattedDOB}</td><td>{child.sex || 'N/A'}</td><td>{child.contact_number || 'N/A'}</td><td>{fullAddress}</td><td>{child.religion || 'N/A'}</td><td>{child.ip_membership || 'N/A'}</td><td>{child.disability_special_needs || 'N/A'}</td><td>{child.critical_illness || 'N/A'}</td>
+                      <td>{profile.name || 'N/A'}</td>
+                      <td>{profile.birthday || 'N/A'}</td>
+                      <td>{profile.sex || 'N/A'}</td>
+                      <td>{profile.contact || 'N/A'}</td>
+                      <td>{profile.address || 'N/A'}</td>
+                      <td>{profile.religion || 'N/A'}</td>
+                      <td>{profile.ip || 'N/A'}</td>
+                      <td>{profile.disability || 'N/A'}</td>
+                      <td>{profile.illness || 'N/A'}</td>
                       <td><button className="checkBtn" onClick={() => router.push(`/profile?id=${profile.id}`)}>Check Information</button></td>
                     </tr>
                   );
@@ -239,11 +278,36 @@ export default function TablePage() {
 
         <footer className="footerControls">
           <button className="btnPrint">PRINT REPORT</button>
+          
+          {/* BINAGO: Dynamic Pagination Buttons */}
           <div className="pagination">
-            <button className="pgBtn">&lt;</button>
-            <button className="pgBtn active">1</button>
-            <button className="pgBtn">2</button>
-            <button className="pgBtn">&gt;</button>
+            <button 
+              className="pgBtn" 
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              style={{ opacity: currentPage === 1 ? 0.5 : 1, cursor: currentPage === 1 ? 'not-allowed' : 'pointer' }}
+            >
+              &lt;
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(pageNum => (
+              <button 
+                key={pageNum}
+                className={`pgBtn ${currentPage === pageNum ? 'active' : ''}`}
+                onClick={() => setCurrentPage(pageNum)}
+              >
+                {pageNum}
+              </button>
+            ))}
+            
+            <button 
+              className="pgBtn" 
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              style={{ opacity: currentPage === totalPages ? 0.5 : 1, cursor: currentPage === totalPages ? 'not-allowed' : 'pointer' }}
+            >
+              &gt;
+            </button>
           </div>
         </footer>
 

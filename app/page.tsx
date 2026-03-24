@@ -85,11 +85,13 @@ export default function LoginPage() {
       });
   };
 
+  
+
   return (
     <div className="loginWrapper">
       <div className="overlay">
         <div className="loginCard">
-          <div className="header">
+          <div className="loginHeader">
             <img src="/logo1.png" className="logo" alt="City Logo" />
             <div className="title">
               <h1>City Social Welfare and Development Office</h1>
@@ -126,4 +128,6 @@ export default function LoginPage() {
       </div>
     </div>
   );
+
+  
 }
