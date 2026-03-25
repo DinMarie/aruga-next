@@ -18,7 +18,18 @@ const FILTER_OPTIONS = {
   illnesses: ["None", "Cancer", "Cardio-vascular Disease", "Paralysis", "Organ Failure"]
 };
 
-// 2. UPDATED INTERFACE
+// 1.5 ACRONYM & ALIAS MAP
+// Add any acronyms you expect to see in your database here
+const ALIAS_MAP: Record<string, string[]> = {
+  "Cardio-vascular Disease": ["CVD", "Cardiovascular"],
+  "Iglesia ni Cristo": ["INC"],
+  "Deaf/Hard of Hearing": ["HOH", "Deaf"],
+  "Speech and Language Impairment": ["SLI"],
+  "United Methodists Church": ["UMC"],
+  "Non-IP": ["Non IP", "Non-Ip", "Non Indigenous","N/A", "None"],
+};
+
+// 2. INTERFACE
 interface ProfileData {
   id: string;
   name?: string;
@@ -44,9 +55,8 @@ export default function TablePage() {
     barangay: [], gender: [], religion: [], ip: [], disability: [], illness: []
   });
   
-  // NEW: Pagination states
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 10; // Change this number to show more/less rows per page
+  const ITEMS_PER_PAGE = 10; 
 
   useEffect(() => {
     async function fetchData() {
@@ -59,7 +69,7 @@ export default function TablePage() {
     fetchData();
   }, []);
 
-  // NEW: Reset to page 1 whenever search or filters change
+  // Reset to page 1 whenever search or filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedFilters]);
@@ -84,8 +94,9 @@ export default function TablePage() {
     setSearchTerm("");
   };
 
-  // --- FILTER LOGIC ---
+  // --- BULLETPROOF CASE-INSENSITIVE & ACRONYM FILTER LOGIC ---
   const displayedProfiles = profiles.filter(profile => {
+    // 1. SEARCH FILTER
     let matchSearch = true;
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
@@ -94,20 +105,39 @@ export default function TablePage() {
       matchSearch = !!(matchName || matchAddress);
     }
 
-    const matchBarangay = selectedFilters.barangay.length === 0 || selectedFilters.barangay.some(b => profile.address?.includes(b));
-    const matchGender = selectedFilters.gender.length === 0 || selectedFilters.gender.includes(profile.sex || "");
-    const matchReligion = selectedFilters.religion.length === 0 || selectedFilters.religion.includes(profile.religion || "");
-    const matchIp = selectedFilters.ip.length === 0 || selectedFilters.ip.includes(profile.ip || "");
-    const matchDisability = selectedFilters.disability.length === 0 || selectedFilters.disability.includes(profile.disability || "");
-    const matchIllness = selectedFilters.illness.length === 0 || selectedFilters.illness.includes(profile.illness || "");
+    // HELPER FUNCTION: Checks for exact match OR acronym match
+    const isMatch = (selectedList: string[], dbValue: string = "") => {
+      if (selectedList.length === 0) return true; // Bypass if no filters checked
+      
+      const cleanDbValue = dbValue.trim().toLowerCase();
 
+      return selectedList.some(filterItem => {
+        // Check if it matches the main filter word
+        if (filterItem.toLowerCase() === cleanDbValue) return true;
+        
+        // Check if it matches any known acronyms for this filter word
+        const aliases = ALIAS_MAP[filterItem] || [];
+        return aliases.some(alias => alias.toLowerCase() === cleanDbValue);
+      });
+    };
+
+    // 2. CATEGORY FILTERS
+    const matchBarangay = selectedFilters.barangay.length === 0 || 
+      selectedFilters.barangay.some(b => profile.address?.toLowerCase().includes(b.toLowerCase()));
+
+    const matchGender = isMatch(selectedFilters.gender, profile.sex);
+    const matchReligion = isMatch(selectedFilters.religion, profile.religion);
+    const matchIp = isMatch(selectedFilters.ip, profile.ip);
+    const matchDisability = isMatch(selectedFilters.disability, profile.disability);
+    const matchIllness = isMatch(selectedFilters.illness, profile.illness);
+
+    // 3. FINAL COMBINATION
     return matchSearch && matchBarangay && matchGender && matchReligion && matchIp && matchDisability && matchIllness;
   });
 
-  // --- NEW: PAGINATION LOGIC ---
+  // --- PAGINATION LOGIC ---
   const totalPages = Math.max(1, Math.ceil(displayedProfiles.length / ITEMS_PER_PAGE));
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  // Slice the filtered array to only get the items for the current page
   const paginatedProfiles = displayedProfiles.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
@@ -251,7 +281,6 @@ export default function TablePage() {
               </tr>
             </thead>
             <tbody>
-              {/* BINAGO: Render paginatedProfiles instead of displayedProfiles */}
               {paginatedProfiles.length === 0 ? (
                 <tr><td colSpan={10} style={{ textAlign: 'center', padding: '20px' }}>No records found matching your filters.</td></tr>
               ) : (
@@ -279,7 +308,6 @@ export default function TablePage() {
         <footer className="footerControls">
           <button className="btnPrint">PRINT REPORT</button>
           
-          {/* BINAGO: Dynamic Pagination Buttons */}
           <div className="pagination">
             <button 
               className="pgBtn" 

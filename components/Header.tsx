@@ -32,7 +32,7 @@ export default function Header({ subtitle, username }: HeaderProps) {
         
         {/* LEFT SIDE */}
         <div className="headerLeft">
-          <img src="/cswd.png" alt="CSWD Logo" className="logo" />
+          <img src="/seal.png" alt="CSWD Logo" className="logo" />
           <h2 className="title">CSWDO - Biñan City</h2>
         </div>
 
