@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import Header from '../../components/Header';
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../../lib/firebase";
+import { useReactToPrint } from 'react-to-print';
 
 // 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
@@ -19,7 +20,6 @@ const FILTER_OPTIONS = {
 };
 
 // 1.5 ACRONYM & ALIAS MAP
-// Add any acronyms you expect to see in your database here
 const ALIAS_MAP: Record<string, string[]> = {
   "Cardio-vascular Disease": ["CVD", "Cardiovascular"],
   "Iglesia ni Cristo": ["INC"],
@@ -49,6 +49,9 @@ export default function TablePage() {
   const [openCategory, setOpenCategory] = useState<string | null>(null);
   const router = useRouter();
 
+  // --- NOTIFICATION STATE ---
+  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' | 'loading' } | null>(null);
+
   // --- SEARCH, FILTER & PAGINATION STATES ---
   const [searchTerm, setSearchTerm] = useState(""); 
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({
@@ -57,6 +60,41 @@ export default function TablePage() {
   
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 10; 
+
+  // --- PRINT SETUP ---
+  const componentRef = useRef<HTMLDivElement>(null);
+  
+  const performPrint = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: 'Aruga_Summary_Report',
+    
+    // 1. LALABAS MUNA ANG PREPARING BAGO BUMUKAS ANG PRINT WINDOW
+    onBeforePrint: () => {
+      return new Promise<void>((resolve) => {
+        setNotification({ message: "⏳ Preparing report, please wait...", type: 'loading' });
+        setTimeout(() => resolve(), 1000); // Hintay 1 segundo bago i-trigger yung print dialog
+      });
+    },
+    
+    // 2. LALABAS ANG SUCCESS PAGKATAPOS MAG-SAVE AS PDF / MAG-PRINT
+    onAfterPrint: () => {
+      setNotification({ message: "✅ Report generated successfully!", type: 'success' });
+      // Mawawala ang notification after 4 seconds
+      setTimeout(() => setNotification(null), 4000);
+    },
+    
+    // 3. KUNG SAKALING MAY MAG-ERROR SA SYSTEM
+    onPrintError: () => {
+      setNotification({ message: "❌ Failed to generate report.", type: 'error' });
+      setTimeout(() => setNotification(null), 4000);
+    }
+  });
+
+  const handlePrintClick = () => {
+    if (performPrint) {
+      performPrint();
+    }
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -112,10 +150,8 @@ export default function TablePage() {
       const cleanDbValue = dbValue.trim().toLowerCase();
 
       return selectedList.some(filterItem => {
-        // Check if it matches the main filter word
         if (filterItem.toLowerCase() === cleanDbValue) return true;
         
-        // Check if it matches any known acronyms for this filter word
         const aliases = ALIAS_MAP[filterItem] || [];
         return aliases.some(alias => alias.toLowerCase() === cleanDbValue);
       });
@@ -142,6 +178,30 @@ export default function TablePage() {
 
   return (
     <div className="tableWrapper">
+      {/* FLOATING NOTIFICATION BANNER */}
+      {notification && (
+        <div style={{
+          position: 'fixed',
+          top: '100px', 
+          left: '50%',
+          transform: 'translateX(-50%)', 
+          backgroundColor: notification.type === 'loading' ? '#2196F3' : notification.type === 'success' ? '#4CAF50' : '#f44336',
+          color: 'white',
+          padding: '15px 30px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+          zIndex: 999999,
+          fontWeight: 'bold',
+          fontSize: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          transition: 'all 0.3s ease'
+        }}>
+          {notification.message}
+        </div>
+      )}
+
       <div className="pageContainer">
         <Header />
 
@@ -306,7 +366,7 @@ export default function TablePage() {
         </div>
 
         <footer className="footerControls">
-          <button className="btnPrint">PRINT REPORT</button>
+          <button className="btnPrint" onClick={handlePrintClick}>PRINT REPORT</button>
           
           <div className="pagination">
             <button 
@@ -338,6 +398,47 @@ export default function TablePage() {
             </button>
           </div>
         </footer>
+
+        {/* HIDDEN PRINTABLE TABLE */}
+        <div style={{ overflow: 'hidden', height: 0, width: 0, position: 'absolute', left: '-9999px', top: '-9999px' }}>
+          <div ref={componentRef} style={{ padding: '20px', backgroundColor: 'white', color: 'black' }}>
+            <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Summary of Informations</h2>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+              <thead>
+                <tr>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>Name</th>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>Birthday</th>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>Sex</th>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>Contact Number</th>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>Address</th>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>Religion</th>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>IP</th>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>Disability</th>
+                  <th style={{ borderBottom: '1px solid #000', padding: '8px' }}>Illness</th>
+                </tr>
+              </thead>
+              <tbody>
+                {displayedProfiles.length === 0 ? (
+                  <tr><td colSpan={9} style={{ textAlign: 'center', padding: '20px' }}>No records found.</td></tr>
+                ) : (
+                  displayedProfiles.map((profile) => (
+                    <tr key={profile.id}>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.name || 'N/A'}</td>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.birthday || 'N/A'}</td>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.sex || 'N/A'}</td>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.contact || 'N/A'}</td>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.address || 'N/A'}</td>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.religion || 'N/A'}</td>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.ip || 'N/A'}</td>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.disability || 'N/A'}</td>
+                      <td style={{ borderBottom: '1px solid #ccc', padding: '8px' }}>{profile.illness || 'N/A'}</td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
 
       </div>
     </div>
