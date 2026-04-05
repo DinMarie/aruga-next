@@ -356,7 +356,7 @@ export default function TablePage() {
                       <td>{profile.ip || 'N/A'}</td>
                       <td>{profile.disability || 'N/A'}</td>
                       <td>{profile.illness || 'N/A'}</td>
-                      <td><button className="checkBtn" onClick={() => router.push(`/profile?id=${profile.id}`)}>Check Information</button></td>
+                     <td><button className="checkBtn" onClick={() => router.push(`/fulldetails?id=${profile.id}`)}>Check Information</button></td>
                     </tr>
                   );
                 })

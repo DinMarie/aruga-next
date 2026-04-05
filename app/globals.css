@@ -52,37 +52,7 @@
 .modalOverlay .noBtn { padding: 12px 35px; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; background: #bbb; color: white; }
 .modalOverlay .noBtn:hover { opacity: 0.85; }
 
-/* ================= ADD PAGE ================= */
-.addWrapper, .addWrapper * { box-sizing: border-box; font-family: Arial, sans-serif; }
-.addWrapper { background-color: #f4f4f4; min-height: 100vh; padding-bottom: 50px; }
-.addWrapper .container { margin-top: 90px; padding: 20px; background: white; max-width: 1200px; margin-left: auto; margin-right: auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 8px;}
-.addWrapper .backButton { margin: 100px 0 -80px 20px; }
-.addWrapper .backButton button { background: none; border: none; font-size: 24px; cursor: pointer; color: #512da8; font-weight: bold; }
-.addWrapper .topRow { display: flex; gap: 20px; margin-bottom: 20px; }
-.addWrapper .fieldGroup { display: flex; align-items: center; gap: 10px; }
-.addWrapper .fieldGroup input { border: none; border-bottom: 1px solid black; outline: none; width: 150px; font-size: 14px; }
-.addWrapper .infoSection { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px; margin-bottom: 30px; }
-.addWrapper .formRow { display: flex; align-items: center; gap: 10px; }
-.addWrapper .lineInput { border: none; border-bottom: 2px solid #777; flex: 1; outline: none; font-size: 14px; background: transparent; }
-.addWrapper .sectionTitle { background: #8c6d8c; color: white; text-align: center; padding: 8px; margin-top: 30px; margin-bottom: 10px; font-weight: bold; }
-.addWrapper .profileTable { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-.addWrapper .profileTable td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-.addWrapper .profileTable input { width: 100%; border: none; outline: none; background: transparent; font-size: 14px; }
-.addWrapper .rCol { width: 50px; font-weight: bold; }
-.addWrapper .labelCol { width: 250px; font-weight: bold; }
-.addWrapper .codeCol { width: 120px; text-align: center; font-size: 12px; background: #f9f9f9; }
-.addWrapper .codeInput { width: 50px !important; border-bottom: 1px solid #000 !important; text-align: center; }
-.addWrapper .familySize { margin-top: 20px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; font-weight: bold; }
-.addWrapper .familySizeInput { border: none; border-bottom: 1px solid black; outline: none; width: 100px; text-align: center; }
-.addWrapper .familyTable { width: 100%; border-collapse: collapse; }
-.addWrapper .familyTable th, .addWrapper .familyTable td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-.addWrapper .familyTable th { background: #f8f8f8; font-size: 13px; text-align: center; }
-.addWrapper .familyTable input { width: 100%; border: none; outline: none; background: transparent; }
-.addWrapper .nextContainer { display: flex; justify-content: flex-end; margin-top: 30px; }
-.addWrapper .nextBtn { background: #512da8; color: white; border: none; padding: 12px 40px; border-radius: 25px; font-size: 14px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-.addWrapper .nextBtn:hover { background: #3e1e82; }
-.addWrapper .footer { background: #8c6d8c; height: 35px; width: 100%; position: fixed; bottom: 0; left: 0; display: flex; align-items: center; justify-content: center; }
-.addWrapper .footer p { color: white; font-size: 13px; margin: 0; }
+
 
 /* ================= ANALYTICS PAGE ================= */
 .analyticsWrapper, .analyticsWrapper * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
@@ -128,25 +98,32 @@
 .analyticsWrapper .btnApply { background-color: #512da8; color: white; padding: 8px 22px; border-radius: 30px; border: none; font-size: 0.9rem; cursor: pointer; }
 .analyticsWrapper .btnClearAll { color: #666; text-decoration: underline; padding: 5px 8px; background: none; border: none; cursor: pointer; }
 
-/* ================= FORM PAGE ================= */
-.formWrapper, .formWrapper * { font-family: Arial, sans-serif; box-sizing: border-box; }
-.formWrapper { padding-bottom: 35px; background-color: white; min-height: 100vh; }
-.formWrapper table { width:100%; border-collapse:collapse; margin-top:20px; }
-.formWrapper th, .formWrapper td { border:1px solid black; padding:8px; font-size:14px; }
-.formWrapper th { background:#e6e6e6; }
-.formWrapper table input { width:95%; border:none; outline:none; }
-.formWrapper .container { margin-top: 90px; }
-.formWrapper .sectionTitle { background:#8c6d8c; color:white; text-align:center; padding:10px; margin:20px auto; width:60%; font-weight:bold; }
-.formWrapper .formSection { width:65%; margin:auto; margin-top:20px; }
-.formWrapper .question { margin-top:20px; font-weight:500; }
-.formWrapper .radioOption { display:block; margin:8px 0 8px 25px; font-size:14px; }
-.formWrapper .radioOption input { margin-right:10px; transform:scale(1.2); }
-.formWrapper .lineInput { border:none; border-bottom:2px solid #999; width:400px; padding:5px; font-size:14px; outline:none; }
-.formWrapper .submitContainer { display:flex; justify-content:flex-end; margin-top:20px; }
-.formWrapper .submitBtn { background:#6cc04a; color:white; border:none; padding:10px 30px; border-radius:25px; font-size:14px; cursor:pointer; }
-.formWrapper .submitBtn:hover { background:#5aa73d; }
-.formWrapper .footer { background:#8c6d8c; height:35px; width:100%; position:fixed; bottom:0; left:0; display:flex; align-items:center; justify-content:center;}
-.formWrapper .footer p { color:white; font-size:13px; margin:0;}
+/* ================= COMBINED ADD PROFILE PAGE ================= */
+.addWrapper, .addWrapper * { box-sizing: border-box; font-family: Arial, sans-serif; }
+.addWrapper { background-color: #f4f4f4; min-height: 100vh; padding-bottom: 50px; padding-top: 20px; }
+
+/* Input and Row Layouts */
+.addWrapper .topRow { display: flex; gap: 20px; margin-bottom: 20px; }
+.addWrapper .fieldGroup { display: flex; align-items: center; gap: 10px; }
+.addWrapper .infoSection { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px; margin-bottom: 30px; }
+.addWrapper .formRow { display: flex; align-items: center; gap: 10px; }
+.addWrapper .line-input { border: none; border-bottom: 2px solid #777; flex: 1; outline: none; font-size: 14px; background: transparent; }
+
+/* Headings */
+.addWrapper .section-title { background: #8c6d8c; color: white; text-align: center; padding: 10px; margin-top: 30px; margin-bottom: 15px; font-weight: bold; width: 100%; }
+.addWrapper .form-section { width: 100%; margin: auto; margin-top: 20px; margin-bottom: 30px;}
+
+/* Assessment Questions */
+.addWrapper .question { margin-top: 20px; font-weight: 500; }
+.addWrapper .question h4 { margin: 0 0 10px 0; color: #333; }
+.addWrapper .radio-option { display: block; margin: 8px 0 8px 25px; font-size: 14px; cursor: pointer; }
+.addWrapper .radio-option input[type="radio"], .addWrapper .radio-option input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); cursor: pointer; }
+
+/* Health Expense Table */
+.addWrapper .health-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+.addWrapper .health-table th, .addWrapper .health-table td { border: 1px solid #ccc; padding: 8px; font-size: 14px; }
+.addWrapper .health-table th { background: #e6e6e6; }
+.addWrapper .health-table input { width: 95%; border: none; outline: none; background: transparent; }
 
 /* ================= LOGIN PAGE ================= */
 .loginWrapper { 
@@ -338,4 +315,44 @@
   margin-top: 80px;
   width: calc(100% - 240px);
   padding: 20px;
+}
+
+/* ================= FULL DETAILS (PRINT) PAGE ================= */
+.fullDetailsWrapper, .fullDetailsWrapper * { box-sizing: border-box; font-family: Arial, sans-serif; }
+.fullDetailsWrapper { background-color: #e5e7eb; display: flex; flex-direction: column; align-items: center; padding: 20px; gap: 20px; min-height: 100vh; }
+
+.fullDetailsWrapper .page { width: 8.5in; min-height: 13in; background: white; padding: 0.5in 0.6in; box-shadow: 0 4px 6px rgba(0,0,0,0.1); position: relative; margin-bottom: 20px; }
+
+/* Typography & Headers */
+.fullDetailsWrapper h2.section-title { background-color: #a48ca3; color: white; text-align: center; padding: 6px; font-size: 13px; margin: 0; text-transform: uppercase; font-weight: bold; border: 1px solid #000; border-bottom: none; }
+.fullDetailsWrapper h3.subsection-title { font-size: 13px; font-weight: bold; margin: 20px 0 10px 0; text-transform: uppercase; }
+
+/* Tables */
+.fullDetailsWrapper table { width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px; }
+.fullDetailsWrapper th, .fullDetailsWrapper td { border: 1px solid #000; padding: 5px 8px; vertical-align: middle; }
+.fullDetailsWrapper .header-info td { height: 28px; }
+.fullDetailsWrapper .code-col { text-align: right; width: 60px; }
+
+/* Form Elements */
+.fullDetailsWrapper .q-block { margin-top: 15px; font-size: 12px; }
+.fullDetailsWrapper .question { font-weight: normal; margin-bottom: 8px; margin-left: 20px; }
+.fullDetailsWrapper .options { margin-left: 45px; display: flex; flex-direction: column; gap: 8px; }
+.fullDetailsWrapper .option-row { display: flex; align-items: center; gap: 8px; }
+
+/* Specific Layouts */
+.fullDetailsWrapper .family-size-header { border: 1px solid #000; border-top: none; border-bottom: none; padding: 10px; font-weight: bold; font-size: 13px; }
+.fullDetailsWrapper .write-lines { display: flex; flex-direction: column; gap: 20px; margin-top: 10px; }
+.fullDetailsWrapper .write-line { border-bottom: 1px solid #000; width: 100%; height: 15px; }
+
+/* Logos */
+.fullDetailsWrapper .logo-container { display: flex; justify-content: flex-start; align-items: center; gap: 15px; margin-bottom: 20px; }
+.fullDetailsWrapper .main-logo { height: 60px; width: auto; display: block; }
+.fullDetailsWrapper .bagong-logo { margin-top: -26px; }
+
+/* Print formatting */
+@media print {
+    body { background: none; padding: 0; margin: 0; }
+    .fullDetailsWrapper { background: none; padding: 0; display: block; min-height: auto; }
+    .fullDetailsWrapper .page { box-shadow: none; margin: 0; padding: 0.5in; page-break-after: always; width: 100%; }
+    .no-print { display: none !important; }
 }
