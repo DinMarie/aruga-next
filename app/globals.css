@@ -356,3 +356,28 @@
     .fullDetailsWrapper .page { box-shadow: none; margin: 0; padding: 0.5in; page-break-after: always; width: 100%; }
     .no-print { display: none !important; }
 }
+
+@media print {
+  /* Hide the UI elements (Toolbar, Sidebar, Bottom nav, Header) */
+  .actionBar, .filterGroupContainer, .bottom_navi, header, .header {
+    display: none !important;
+  }
+
+  /* Reset the main layout so it takes up the full printable area */
+  body, .pageContainer, .analyticsWrapper, .mainPaperContainer {
+    background: white !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Reset any zoom transformations applied by the UI */
+  #pagesContainer {
+    transform: scale(1) !important;
+    box-shadow: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
