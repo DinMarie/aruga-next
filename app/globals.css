@@ -117,8 +117,8 @@
 }
 
 .profileWrapper .container {
-  width: 8.5in; /* Standard Letter Paper Width */
-  max-width: 95%;
+  width: 100%; /* Standard Letter Paper Width */
+  max-width: 100%;
   margin: 0 auto;
   background: white;
   padding: 0.6in 0; /* Keep top/bottom padding, zero side padding for seamless edge */
