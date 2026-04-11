@@ -53,7 +53,7 @@ export default function TablePage() {
   });
   const [otherInputs, setOtherInputs] = useState({ religion: "", ip: "", illness: "" });
   const [currentPage, setCurrentPage] = useState(1);
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 13;
   const componentRef = useRef<HTMLDivElement>(null);
 
   const performPrint = useReactToPrint({
