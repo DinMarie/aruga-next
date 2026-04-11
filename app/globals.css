@@ -102,7 +102,7 @@
 /* "DIGITAL PAPER FORM" STYLES (ADD & EDIT PAGES)            */
 /* ========================================================= */
 
-.addWrapper, .profileWrapper { 
+.profileWrapper { 
   background-color: #ffffff; /* Seamless pure white background */
   min-height: 100vh; 
   padding-bottom: 50px; 
@@ -112,11 +112,11 @@
   box-sizing: border-box;
 }
 
-.addWrapper *, .profileWrapper * {
+.profileWrapper * {
   box-sizing: border-box;
 }
 
-.addWrapper .container, .profileWrapper .container {
+.profileWrapper .container {
   width: 8.5in; /* Standard Letter Paper Width */
   max-width: 95%;
   margin: 0 auto;
@@ -142,7 +142,7 @@
 
 
 /* Section Titles */
-.addWrapper .section-title, .profileWrapper .sectionTitle, .profileWrapper .section-title { 
+.profileWrapper .sectionTitle, .profileWrapper .section-title { 
   background-color: #d9d9d9; 
   color: black; 
   border: 1px solid black;
@@ -157,15 +157,10 @@
 }
 
 /* Fill-in-the-blank text inputs (_____________) */
-.addWrapper input[type="text"],
-.addWrapper input[type="date"],
-.addWrapper input[type="time"],
-.addWrapper input[type="number"],
 .profileWrapper input[type="text"],
 .profileWrapper input[type="date"],
 .profileWrapper input[type="time"],
 .profileWrapper input[type="number"],
-.addWrapper .line-input,
 .profileWrapper .lineInput {
   border: none;
   border-bottom: 1px solid black; /* Solid black underline */
@@ -180,36 +175,35 @@
 }
 
 /* Highlight input when clicked so user knows where they are typing */
-.addWrapper input:focus, .profileWrapper input:focus {
+.profileWrapper input:focus {
   background-color: rgba(255, 255, 0, 0.15); /* Very faint yellow highlighter */
   border-bottom: 2px solid black;
 }
 
 /* Read-Only text inputs */
-.addWrapper input[readOnly], .profileWrapper input[readOnly] {
+.profileWrapper input[readOnly] {
   color: #666;
   border-bottom: 1px dashed #666;
   background-color: #f9f9f9;
 }
 
 /* Layout Rows */
-.addWrapper .topRow, .profileWrapper .topRow { display: flex; gap: 20px; margin-bottom: 20px; }
-.addWrapper .fieldGroup, .profileWrapper .fieldGroup { display: flex; align-items: flex-end; gap: 5px; flex: 1; }
-.addWrapper .infoSection, .profileWrapper .infoSection { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 40px; margin-bottom: 20px; }
-.addWrapper .formRow, .profileWrapper .formRow { display: flex; align-items: flex-end; gap: 5px; }
-.addWrapper .formRow label, .profileWrapper .formRow label { font-weight: normal; font-size: 13px; white-space: nowrap; }
-.addWrapper .formRow input, .profileWrapper .formRow input { flex: 1; }
+.profileWrapper .topRow { display: flex; gap: 20px; margin-bottom: 20px; }
+.profileWrapper .fieldGroup { display: flex; align-items: flex-end; gap: 5px; flex: 1; }
+.profileWrapper .infoSection { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 40px; margin-bottom: 20px; }
+.profileWrapper .formRow { display: flex; align-items: flex-end; gap: 5px; }
+.profileWrapper .formRow label { font-weight: normal; font-size: 13px; white-space: nowrap; }
+.profileWrapper .formRow input { flex: 1; }
 
 
 /* Tables (Strict black borders) */
-.addWrapper table, .profileWrapper table { 
+.profileWrapper table { 
   width: 100%; 
   border-collapse: collapse; 
   margin-top: 10px; 
   margin-bottom: 20px;
 }
 
-.addWrapper table th, .addWrapper table td, 
 .profileWrapper table th, .profileWrapper table td { 
   border: 1px solid black; 
   padding: 6px; 
@@ -217,41 +211,29 @@
   vertical-align: middle;
 }
 
-.addWrapper table th, .profileWrapper table th { 
+.profileWrapper table th { 
   background: #f2f2f2; 
   font-weight: bold; 
   text-align: center; 
 }
 
 /* Remove underlines for inputs *inside* table cells to just fill the box */
-.addWrapper table input, .profileWrapper table input { 
+.profileWrapper table input { 
   border: none; 
   border-bottom: none; 
   width: 100%; 
   background: transparent; 
   padding: 4px;
 }
-.addWrapper table input:focus, .profileWrapper table input:focus {
+.profileWrapper table input:focus {
   border-bottom: none;
   box-shadow: inset 0 0 0 2px black; /* Give it an inner black border focus ring inside table */
 }
 
-/* Assessment Questions */
-.addWrapper .form-section { margin-top: 10px; margin-bottom: 20px; }
-.addWrapper .form-section h3 { font-size: 14px; margin-top: 20px; text-transform: uppercase; font-weight: bold;}
-.addWrapper .question { margin-top: 15px; }
-.addWrapper .question h4 { margin: 0 0 5px 0; font-size: 13px; font-weight: bold; color: black; }
-.addWrapper .radio-option { display: flex; align-items: center; font-size: 13px; margin: 4px 0 4px 20px; cursor: pointer; }
-.addWrapper .radio-option input[type="radio"], .addWrapper .radio-option input[type="checkbox"] { margin-right: 8px; cursor: pointer; accent-color: black; }
-.addWrapper .radio-option input[type="text"] { margin-left: 5px; flex: 1; }
 
 /* Specific adjusting for Family Size */
-.addWrapper .familySize, .profileWrapper .familySize { margin-top: 15px; margin-bottom: 15px; display: flex; align-items: flex-end; gap: 8px; font-size: 13px; font-weight: bold;}
-.addWrapper .familySize input, .profileWrapper .familySizeInput { width: 100px; }
-
-/* Submits/Modals for Add Profile */
-.addWrapper .submit-container { display: flex; justify-content: flex-end; margin-top: 40px; padding-right: 20px; }
-.addWrapper .submit-container button { background: #6cc04a; color: white; padding: 12px 40px; border-radius: 25px; border: none; cursor: pointer; font-weight: bold;}
+.profileWrapper .familySize { margin-top: 15px; margin-bottom: 15px; display: flex; align-items: flex-end; gap: 8px; font-size: 13px; font-weight: bold;}
+.profileWrapper .familySizeInput { width: 100px; }
 
 /* Modals & Footers for Profile Page */
 .profileWrapper .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); justify-content: center; align-items: center; z-index: 2000; }
@@ -488,3 +470,127 @@
     margin: 0 !important;
   }
 }
+
+/* ========================================================= */
+/* ARUGA FORMS CSS (STEP 1 & 2) - SCOPED TO .addWrapper      */
+/* ========================================================= */
+
+.addWrapper {
+    min-height: 100vh;
+    padding-bottom: 60px;
+    font-family: Arial, Helvetica, sans-serif;
+    background: white;
+    color: black;
+}
+
+/* ===== HEADER ===== */
+.addWrapper .header { background-color: #a68cb0; color: white; display: flex; align-items: center; justify-content: space-between; padding: 10px 25px; position: fixed; top: 0; width: 100%; box-sizing: border-box; z-index: 1000; }
+.addWrapper .header-left { display: flex; align-items: center; }
+.addWrapper .header img { height: 45px; margin-right: 15px; }
+.addWrapper .header h2 { margin: 0; font-size: 16px; font-weight: normal; }
+.addWrapper .header h3, .addWrapper .header-title2 { font-size: 14px; margin: 0; position: absolute; left: 50%; transform: translateX(-50%); font-weight: bold; }
+
+/* ===== DROPDOWN ===== */
+.addWrapper .dropdown { position: relative; }
+.addWrapper .dropbtn { background: none; border: none; color: white; font-size: 15px; cursor: pointer; }
+.addWrapper .dropdown-content { display: none; position: absolute; right: 0; background: white; min-width: 120px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+.addWrapper .dropdown-content a { display: block; padding: 10px; text-decoration: none; color: black; }
+.addWrapper .logout { color: red; }
+
+/* ===== BACK BUTTON ===== */
+.addWrapper .back-button { position: absolute; top: 90px; left: 20px; z-index: 10;}
+.addWrapper .back-button a { display: flex; justify-content: center; align-items: center; width: 40px; height: 40px; border: 2px solid #8c6d8c; border-radius: 50%; text-decoration: none; font-size: 20px; color: #8c6d8c; background: white; transition: 0.2s; cursor: pointer;}
+.addWrapper .back-button a:hover { background: #8c6d8c; color: white; }
+
+/* ===== MAIN CONTAINER ===== */
+.addWrapper .container { margin-top: 130px; padding: 20px; padding-bottom: 120px; background: white; }
+
+/* ===== STEP 1 & 2 SHARED ===== */
+.addWrapper .section-title { background: #8c6d8c; color: white; text-align: center; padding: 6px; font-weight: bold; margin-top: 20px;}
+.addWrapper .line-input { border: none; border-bottom: 2px solid #777; outline: none; padding: 5px; font-size: 14px; background: transparent; }
+
+/* ===== STEP 1 SPECIFIC ===== */
+.addWrapper .step-1 .section-title { width: auto; }
+.addWrapper .step-1 .line-input { flex: 1; }
+.addWrapper .info-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 40px; max-width: 900px; }
+.addWrapper .form-row { display: flex; align-items: center; gap: 10px; }
+.addWrapper .top-row { display: flex; gap: 20px; margin-bottom: 15px; }
+.addWrapper .field-group { display: flex; align-items: center; gap: 5px; }
+.addWrapper .field-group input { border: none; border-bottom: 1px solid black; outline: none; width: 120px; font-size: 12px; }
+
+.addWrapper table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+.addWrapper table th, .addWrapper table td { border: 1px solid black; padding: 5px; text-align: left; }
+.addWrapper table input { width: 100%; border: none; outline: none; font-size: 12px; background: transparent;}
+.addWrapper table input:focus { background: #eef3ff; }
+
+.addWrapper .profile-table td:nth-child(1) { width: 60px; }
+.addWrapper .profile-table td:nth-child(2) { width: 280px; }
+.addWrapper .profile-table td:nth-child(4) { width: 80px; text-align: center; font-size: 11px; }
+.addWrapper .profile-table tr td { background: #f9f9f9; }
+
+.addWrapper .family-size { margin-top: 20px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.addWrapper .family-size-input { border: none; border-bottom: 1px solid black; outline: none; width: 250px; font-size: 12px; background: transparent; }
+
+/* ===== STEP 2 SPECIFIC ===== */
+.addWrapper .step-2 .form-section { width: 65%; margin: auto; margin-top: 20px; }
+.addWrapper .step-2 .section-title { width: 60%; margin: 20px auto; padding: 10px; }
+.addWrapper .step-2 .line-input { width: 400px; flex: none; }
+
+.addWrapper .question { margin-top: 20px; font-weight: 500; }
+.addWrapper .question h4 { margin-bottom: 10px; margin-top: 0;}
+.addWrapper .radio-option { display: block; margin: 8px 0 8px 25px; font-size: 14px; }
+.addWrapper .radio-option input[type="radio"], .addWrapper .radio-option input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); }
+
+.addWrapper .health-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+.addWrapper .health-table th, .addWrapper .health-table td { border: 1px solid black; padding: 8px; font-size: 14px; }
+.addWrapper .health-table th { background: #e6e6e6; text-align: center; }
+.addWrapper .health-table input { width: 95%; border: none; outline: none; background: transparent; font-size: 14px;}
+
+/* ===== BUTTONS ===== */
+.addWrapper .submit-container, .addWrapper .next-container { display: flex; justify-content: flex-end; margin-top: 20px; width: 100%; }
+.addWrapper .step-2 .submit-container { width: 65%; margin: auto; margin-top: 30px; display: flex; justify-content: flex-end; }
+.addWrapper .submit-btn, .addWrapper .next-btn { background: #6cc04a; color: white; border: none; padding: 10px 30px; border-radius: 25px; font-size: 14px; cursor: pointer; margin-left: auto; font-weight: bold;}
+.addWrapper .submit-btn:hover, .addWrapper .next-btn:hover { background: #5aa73d; }
+
+/* ===== FOOTER ===== */
+.addWrapper .footer { background: #8c6d8c; height: 35px; width: 100%; position: fixed; bottom: 0; left: 0; z-index: 1000;}
+.addWrapper .footer p { color: white; text-align: center; font-size: 13px; margin-top: 8px; }
+
+/* ===== SPECIFIC TO FULLDETAILS (EDIT PROFILE) ===== */
+.addWrapper .container-right {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.addWrapper .container-right button {
+    padding: 10px 25px;
+    border: none;
+    border-radius: 20px;
+    font-size: 11px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+}
+
+.addWrapper .printform-btn { background: #512da8; }
+.addWrapper .printform-btn:hover { background: #3f1e8c; }
+.addWrapper .update-btn { background: #4CAF50; }
+.addWrapper .delete-btn { background: #e53935; }
+
+/* ===== LOGOUT / DELETE MODALS ===== */
+.addWrapper .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.45); display: none; justify-content: center; align-items: center; z-index: 2000;
+}
+.addWrapper .modal-overlay.show { display: flex; }
+.addWrapper .modal-box {
+    background: white; padding: 50px 60px; border-radius: 14px; text-align: center;
+    width: 450px; max-width: 90%; box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+}
+.addWrapper .modal-box p { font-size: 1.4rem; font-weight: 600; color: #333; margin-top: 0;}
+.addWrapper .modal-buttons { margin-top: 35px; display: flex; justify-content: center; gap: 25px; }
+.addWrapper .modal-btn { padding: 12px 35px; border: none; border-radius: 25px; font-size: 1rem; font-weight: bold; cursor: pointer; }
+.addWrapper .modal-btn.yes { background: #d32f2f; color: white; }
+.addWrapper .modal-btn.no { background: #bbb; color: white; }
