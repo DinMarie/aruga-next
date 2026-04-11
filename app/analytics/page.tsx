@@ -31,9 +31,12 @@ export default function SummaryDashboard() {
   const [paperSize, setPaperSize] = useState('letter');
   const [zoom, setZoom] = useState('1');
   const [layout2Pages, setLayout2Pages] = useState(false);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
   const [paperDropdownOpen, setPaperDropdownOpen] = useState(false);
-  const [openCategories, setOpenCategories] = useState<{ [key: string]: boolean }>({});
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [openCategories, setOpenCategories] = useState<{ [key: string]: boolean }>({
+    sex: false, place: false, disabilities: false, illness: false
+  });
 
   // Filter States
   const [filters, setFilters] = useState<{sex: string[], place: string[], disabilities: string[], illness: string[]}>({
@@ -116,15 +119,15 @@ export default function SummaryDashboard() {
           <h1 style="font-size: 24px; color: #2a1b3c; border-bottom: 2px solid #8c6d8c; padding-bottom: 10px; margin-bottom: 20px;">${pageTitle}</h1>
           <div style="display: flex; flex-direction: column; gap: 30px;">
             <div style="width: 100%;">
-                <h4 style="margin-bottom:10px; color:#512da8; text-transform:uppercase; font-size:14px;">Disability Summary</h4>
+                <h4 style="margin-bottom:10px; color:#333; font-size:16px;">Disability Summary</h4>
                 <div style="height:250px; width:100%;"><canvas id="pie1Chart"></canvas></div>
             </div>
             <div style="width: 100%;">
-                <h4 style="margin-bottom:10px; color:#512da8; text-transform:uppercase; font-size:14px;">Illness Summary</h4>
+                <h4 style="margin-bottom:10px; color:#333; font-size:16px;">Illness Summary</h4>
                 <div style="height:250px; width:100%;"><canvas id="pie2Chart"></canvas></div>
             </div>
             <div style="width: 100%; margin-bottom: 60px;">
-                <h4 style="margin-bottom:10px; color:#512da8; text-transform:uppercase; font-size:14px;">Population Summary</h4>
+                <h4 style="margin-bottom:10px; color:#333; font-size:16px;">Population Summary</h4>
                 <div style="height:300px; width:100%;"><canvas id="barChart"></canvas></div>
             </div>
           </div>
@@ -152,14 +155,36 @@ export default function SummaryDashboard() {
         placeCount[r.place] = (placeCount[r.place] || 0) + 1;
     });
 
-    const pieColors = ["#512da8", "#8c6d8c", "#8bc34a", "#2a1b3c", "#facc15", "#e53935", "#36a2eb", "#4bc0c0"];
+    const pieColors = ["#ff6384", "#36a2eb", "#ffcd56", "#4bc0c0", "#9966ff", "#ff9f40", "#512da8", "#8bc34a"];
+
+    const customLegendPlugin = {
+      legend: {
+        position: 'right',
+        labels: {
+          generateLabels: function(chart: any) {
+            const data = chart.data;
+            const dataset = data.datasets[0];
+            return data.labels.map((label: string, i: number) => {
+              const value = dataset.data[i];
+              const total = dataset.data.reduce((a: number, b: number) => a + b, 0);
+              const percent = ((value / total) * 100).toFixed(1);
+              return {
+                text: `${label}: ${value} (${percent}%)`,
+                fillStyle: dataset.backgroundColor[i],
+                index: i
+              };
+            });
+          }
+        }
+      }
+    };
 
     const pie1Ctx = document.getElementById("pie1Chart") as HTMLCanvasElement;
     if (pie1Ctx) {
       chartRefs.current.pie1 = new Chart(pie1Ctx, {
         type: "pie",
         data: { labels: Object.keys(disabilityCount), datasets: [{ data: Object.values(disabilityCount), backgroundColor: pieColors }] },
-        options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: customLegendPlugin }
       });
     }
 
@@ -168,7 +193,7 @@ export default function SummaryDashboard() {
       chartRefs.current.pie2 = new Chart(pie2Ctx, {
         type: "pie",
         data: { labels: Object.keys(illnessCounts), datasets: [{ data: Object.values(illnessCounts), backgroundColor: pieColors }] },
-        options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+        options: { animation: false, responsive: true, maintainAspectRatio: false, plugins: customLegendPlugin }
       });
     }
 
@@ -176,7 +201,7 @@ export default function SummaryDashboard() {
     if (barCtx) {
       chartRefs.current.bar = new Chart(barCtx, {
         type: "bar",
-        data: { labels: Object.keys(placeCount), datasets: [{ label: "Population", data: Object.values(placeCount), backgroundColor: "#512da8" }] },
+        data: { labels: Object.keys(placeCount), datasets: [{ label: "Population", data: Object.values(placeCount), backgroundColor: "#36a2eb" }] },
         options: { animation: false, responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1, precision: 0 } } } }
       });
     }
@@ -237,10 +262,11 @@ export default function SummaryDashboard() {
       }
     });
 
-    // Step 3: Full Table (Cleaned up HTML)
+    // Full Table
     const fullTablePage = createNewPage(false, "Full Table Summary");
     const table = document.createElement("table");
-    table.className = "reportTable";
+    table.style.width = "100%";
+    table.style.marginBottom = "20px";
 
     const sexes = [...new Set(filteredRecords.map(r => r.sex))].sort();
     const disabilityTypes = [...new Set(filteredRecords.map(r => r.disabilities))].sort();
@@ -280,9 +306,8 @@ export default function SummaryDashboard() {
     `;
     fullTablePage.appendChild(table);
 
-    // Step 4: Category Tables
+    // Category Tables
     const categoryTablesPage = createNewPage(false, "Category Tables");
-    
     const categoryLabels: any = { place: "Barangay", sex: "Sex", disabilities: "Disabilities", illness: "Critical Illness" };
     const categories = ["place","sex","disabilities","illness"];
 
@@ -291,7 +316,8 @@ export default function SummaryDashboard() {
       filteredRecords.forEach(r => countMap[r[cat]||"None"] = (countMap[r[cat]||"None"]||0)+1 );
 
       const catTable = document.createElement("table");
-      catTable.className = "categoryTable";
+      catTable.style.width = "100%";
+      catTable.style.marginBottom = "30px";
 
       catTable.innerHTML = `
         <thead>
@@ -345,7 +371,6 @@ export default function SummaryDashboard() {
     setFilteredRecords(globalRecords);
   };
 
-
   // 4. Download PDF
   const downloadPDF = async () => {
     if (!h2cLoaded || !jspdfLoaded) return alert("PDF Libraries are still loading...");
@@ -368,200 +393,239 @@ export default function SummaryDashboard() {
       if(i > 0) pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
     }
-    pdf.save("Aruga_Project_Analytics.pdf");
+    pdf.save("Disability_Analytics.pdf");
   };
 
-
   return (
-    <div className="dashboard-root">
+    <>
       <Script src="https://cdn.jsdelivr.net/npm/chart.js" onReady={() => setChartJsLoaded(true)} />
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" onReady={() => setH2cLoaded(true)} />
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" onReady={() => setJsPdfLoaded(true)} />
 
       <style dangerouslySetInnerHTML={{__html: `
-        .dashboard-root { background-color: #0f111a; min-height: 100vh; display: flex; flex-direction: column; font-family: "Segoe UI", Arial, sans-serif; overflow: hidden; }
-        .page-container { background-color: white; width: 100%; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; overflow: hidden; gap: 20px; flex: 1; position: relative; }
+        .analytics-root-wrapper { background-color: #0f111a; display: flex; justify-content: center; min-height: 100vh; width: 100%; font-family: "Segoe UI", Arial, sans-serif; }
+        .page-container { background-color: white; width: 100%; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); display: flex; flex-direction: column; overflow: visible; gap: 20px; padding-bottom: 80px; }
         
-        /* HEADER */
+        #pagesContainer.two-page { display: grid; grid-template-columns: repeat(2, auto); justify-content: center; gap: 20px; }
+
         .header { background-color: #a68cb0; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8e6e9e; z-index: 1000; }
+        .header-title { color: white; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
         .logo-box { width: 50px; height: 50px; background-color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        
-        /* ACTION BAR */
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content { display: none; position: absolute; background-color: white; min-width: 280px; box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2); z-index: 100; border: 1px solid #ccc; border-radius: 8px; padding: 20px; margin-top: 5px; right: 0; }
+        .dropdown:hover .dropdown-content { display: block; }
+        .user-dropdown { right: 0; min-width: 150px; }
+        .filter-dropdown { left: 0; }
+
         .action-bar { padding: 25px; display: flex; gap: 12px; align-items: center; }
-        .btn { padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; gap: 10px; transition: 0.2s; }
-        .btn:hover { opacity: 0.85; }
-        .btn-filter { background-color: #f1f1f1; color: #333; border: 1px solid #ccc; }
+        .btn { padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-filter { display: flex; align-items: center; gap: 10px; background-color: #f1f1f1; color: #333; border: 1px solid #ccc; padding: 8px 18px; transition: background-color 0.2s ease; }
         .btn-paper { background-color: #512da8; }
+        .btn-paper.show { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
         .btn-print { background-color: #8bc34a; }
         .btn-download { background-color: #ff854c; }
+
+        .paper-choice-dropdown { display: none; position: absolute; background-color: #512da8; min-width: 100px; z-index: 100; padding: 10px; flex-direction: column; gap: 10px; margin-top: -5px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
+        .size { border: none; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; width: 94px; height: 25px; border-radius: 20px; }
+        .btn-a4, .btn-letter, .btn-long { background-color: #ff854c; }
+        .paper-choice-dropdown.show { display: flex; }
+        .paper-choice-dropdown.hide { display: none; }
+        .paper-choice-dropdown a { display: block; padding: 10px 15px; text-decoration: none; color: #333; transition: background 0.1s; }
+        .paper-choice-dropdown a:hover { background-color: #f1f1f1; color: #512da8; cursor: pointer; }
+
+        .checkbox-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 0.9rem; cursor: pointer;}
+        .checkbox-item input { cursor: pointer; }
         .back-Icon { width: 20px; height: 20px; }
 
-        /* PAPER DROPDOWN */
-        .paper-dropdown { position: relative; display: inline-block; }
-        .paper-choice-dropdown { display: flex; position: absolute; background-color: #512da8; min-width: 100px; z-index: 100; padding: 10px; flex-direction: column; gap: 10px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; top: 100%; left: 0; }
-        .size { border: none; font-weight: bold; cursor: pointer; color: white; background-color: #ff854c; width: 100%; padding: 8px; border-radius: 20px; transition: 0.2s; }
-        .size:hover { filter: brightness(1.1); }
+        .main-paper-container { display: flex; flex-direction: row; gap: 20px; align-items: flex-start; width: 100%; }
+        .pagesContainer { justify-content: center; align-content: center; display: flex; gap: 5px; margin-bottom: 50px; transform-origin:top left; padding-left: 60px; }
+        .Analytics-paper { width: 100%; padding: 30px; border-color: black; border: 1px solid #ccc; box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2); display: flex; flex-direction: column; overflow: hidden; margin: 20px auto; background-color: white; }
 
-        /* MAIN CONTENT AREA */
-        .main-workspace { display: flex; flex: 1; overflow: hidden; position: relative; padding-bottom: 60px; }
-        .pagesContainer { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 40px; transform-origin: top center; padding: 20px; overflow-y: auto; padding-right: 360px; transition: transform 0.2s; }
-        .pagesContainer.two-page { display: grid; grid-template-columns: repeat(2, auto); justify-content: center; align-content: start; }
-        .Analytics-paper { padding: 30px; border: 1px solid #ccc; box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); background-color: white; }
-
-        /* --- BEAUTIFUL TABLE FORMATTING --- */
-        .reportTable { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: auto; }
-        .reportTable th, .reportTable td { padding: 6px 4px; font-size: 9px; text-align: center; border: 1px solid #ccc; vertical-align: middle; }
-        .reportTable th { background: #ede7f6; color: #2a1b3c; font-weight: bold; }
-        .reportTable tbody tr:nth-child(even) { background-color: #fcfbfe; }
-        .reportTable tbody tr:hover { background-color: #f3ebfc; }
-
-        .categoryTable { width: 80%; margin: 0 auto 30px auto; border-collapse: collapse; }
-        .categoryTable th, .categoryTable td { padding: 8px; font-size: 11px; text-align: center; border: 1px solid #ccc; }
-        .categoryTable th { background: #ede7f6; color: #2a1b3c; font-weight: bold; font-size: 12px; }
-        .categoryTable tbody tr:nth-child(even) { background-color: #fcfbfe; }
-
-        /* RIGHT FILTER SIDEBAR */
-        .filter-sidebar { width: 340px; background-color: white; height: 100%; position: absolute; right: 0; top: 0; border-left: 1px solid #ccc; box-shadow: -3px 0 10px rgba(0,0,0,0.1); padding: 25px; overflow-y: auto; z-index: 100; transition: transform 0.3s ease; }
-        .filter-sidebar.closed { transform: translateX(100%); }
-        .filter-category { margin-bottom: 12px; border-radius: 8px; background: #f9f9fc; border: 1px solid #e0dce5; overflow: hidden; }
-        .category-header { background-color: #ede7f6; padding: 12px 16px; font-weight: 600; color: #2a1b3c; cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; }
-        .category-header:hover { background-color: #e0d4f0; }
-        .category-checklist { padding: 12px 16px; background: white; border-top: 1px solid #e6dfed; max-height: 250px; overflow-y: auto; }
-        .checkbox-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; color: #1e1428; cursor: pointer; }
-        .checkbox-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: #512da8; cursor: pointer; }
+        .bottom_navi { width: 100%; height: 60px; left: 0; background-color: #a68cb0; position: fixed; padding: 10px; display: flex; justify-content: space-between; align-items: center; z-index: 999; padding-right: 100px; padding-left: 100px; bottom: 0px; box-sizing: border-box;}
         
-        .filter-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 2px solid #eee; }
-        .btn-apply { background-color: #512da8; color: white; padding: 8px 22px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; }
-        .btn-clear-all { color: #666; text-decoration: underline; background: none; border: none; cursor: pointer; }
+        .filter-header-icons { display: flex; justify-content: space-between; align-items: center; }
+        .filter_all { width:410px; min-width:340px; z-index: 100; margin-right: 0px; background-color: transparent; height: 100vh; padding-left: 50px; position: fixed; right: 0; top: 0; pointer-events: none; }
+        .filter-group-container { pointer-events: auto; width: 320px; min-width: 320px; background-color: #fff; padding: 25px; border: 1px solid #ccc; box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); display: flex; flex-direction: column; transition: transform 0.3s ease, opacity 0.3s ease; height: fit-content; max-height: 80vh; overflow-y: auto; border-radius: 8px; margin-left: -15px; position: fixed; margin-top: 100px; transform: translateX(0); opacity: 1; }
+        .filter-group-container.closed { transform: translateX(150%); opacity: 0; pointer-events: none; }
 
-        /* BOTTOM NAV */
-        .bottom_navi { width: 100%; height: 60px; background-color: #a68cb0; position: fixed; bottom: 0; left: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 100px; z-index: 999; }
-        .page_layout { background: none; border: none; cursor: pointer; border-radius: 8px; padding: 5px; transition: background 0.2s; display: flex; align-items: center; gap: 10px; color: white; font-weight: bold; font-size: 16px; }
-        .page_layout:hover { background: rgba(255,255,255,0.2); }
-        .zoom { display: flex; align-items: center; gap: 10px; color: white; font-weight: bold; }
-        .zoom select { padding: 6px 12px; border-radius: 20px; border: none; outline: none; font-weight: bold; }
+        .category-header { cursor: pointer; display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; user-select: none; }
+        .category-checklist { display: none; padding-top: 10px; background-color: #f9f9f9; border-radius: 4px; padding: 10px; width: 100%; border: 1px solid #ccc; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); max-height: 200px; overflow-y: auto; overflow-x: hidden; }
+        .filter-category.active .category-checklist { display: block; }
+        .filter-category.active .category-indicator { transform: rotate(180deg); }
+        .category-indicator { transition: transform 0.2s ease; display: inline-block; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 12px; text-align: left; }
+        th { background-color: #f8f8f8; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        tr:hover { background-color: #e0e0e0; }
+
+        .filter-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 12px; border-top: 2px solid #eee; }
+        .btn-apply { background-color: #512da8 !important; color: white; padding: 8px 22px !important; border-radius: 30px !important; font-size: 0.9rem; border: none; cursor: pointer;}
+        .btn-clear-all { color: #666; text-decoration: underline; padding: 5px 8px; background: none; border: none; cursor: pointer; }
+        .zoom { display: flex; align-items: center; gap: 5px; }
+        .zoom p { font-size: 15px; font-weight: bold; color: white; }
 
         @media print {
-            body, .dashboard-root, .page-container, .main-workspace { height: auto !important; overflow: visible !important; background: white !important; padding: 0 !important; margin: 0 !important; }
-            .header, .action-bar, .bottom_navi, .filter-sidebar { display: none !important; }
-            .pagesContainer { padding: 0 !important; transform: scale(1) !important; display: block !important; }
-            .Analytics-paper { box-shadow: none !important; border: none !important; margin: 0 !important; padding: 0 !important; page-break-after: always !important; width: 100% !important; min-height: 0 !important; }
+          .action-bar, .bottom_navi, .header, .filter_all { display: none !important; }
+          body, .page-container, .analytics-root-wrapper { background: white !important; padding: 0 !important; margin: 0 !important; height: auto !important; overflow: visible !important; box-shadow: none !important; display: block !important; }
+          #pagesContainer { transform: scale(1) !important; gap: 0 !important; display: block !important; padding: 0 !important; margin: 0 !important; }
+          .page { box-shadow: none !important; margin: 0 !important; page-break-after: always !important; }
         }
+        
+        #pagesContainer { display: flex; flex-direction: column; align-items: center; gap: 40px; flex: 1; transform-origin: top center; padding-top: 20px;}
       `}} />
 
-      <div className="page-container">
-        <header className="header">
-          <div className="header-left">
-            <div className="logo-box">
-              <img src="/logo1.png" alt="Logo" onError={(e) => e.currentTarget.style.display='none'} />
-            </div>
-            <span className="header-title" style={{ color: 'white', fontWeight: 'bold' }}>CSWDO - Biñan City</span>
-          </div>
-        </header>
-
-        <div className="action-bar">
-          <button className="btn btn-filter" onClick={() => router.push('/table')}>
-            <img src="/back.png" alt="backbutton" className="back-Icon" /> Back
-          </button>
+      {/* NEW SAFE WRAPPER */}
+      <div className="analytics-root-wrapper">
+        <div className="page-container">
           
-          <div className="paper-dropdown" onMouseLeave={() => setPaperDropdownOpen(false)}>
-            <button className="btn btn-paper" style={{ borderBottomLeftRadius: paperDropdownOpen ? '0' : '20px', borderBottomRightRadius: paperDropdownOpen ? '0' : '20px' }} onClick={() => setPaperDropdownOpen(!paperDropdownOpen)}>
-              Paper Size: {paperSize.toUpperCase()} ▼
-            </button>
-            <div className="paper-choice-dropdown" style={{ display: paperDropdownOpen ? 'flex' : 'none' }}>
-              <button className="size" onClick={() => { setPaperSize('a4'); setPaperDropdownOpen(false); }}>A4</button>
-              <button className="size" onClick={() => { setPaperSize('letter'); setPaperDropdownOpen(false); }}>Letter</button>
-              <button className="size" onClick={() => { setPaperSize('long'); setPaperDropdownOpen(false); }}>Long</button>
-            </div>
-          </div>
-
-          <div style={{ flex: 1 }}></div>
-
-          <button className="btn btn-print" onClick={() => window.print()}>Print Report</button>
-          <button className="btn btn-download" onClick={downloadPDF}>Download PDF</button>
-        </div>
-
-        <div className="main-workspace">
-          <div id="pagesContainer" ref={pagesContainerRef} className={`pagesContainer ${layout2Pages ? 'two-page' : ''}`} style={{ transform: `scale(${zoom})` }}>
-            {isLoading && <h2 style={{ marginTop: '50px' }}>Loading Data from Database...</h2>}
-          </div>
-
-          <div className={`filter-sidebar ${isFilterOpen ? '' : 'closed'}`}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h2 style={{ margin: 0, color: '#2a1b3c' }}>Filters</h2>
-                <button onClick={() => setIsFilterOpen(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#666' }}>✕</button>
+          {/* HEADER */}
+          <header className="header">
+            <div className="header-left">
+              <div className="logo-box">
+                <img src="/images.png" alt="Logo" onError={(e) => e.currentTarget.style.display='none'} />
+              </div>
+              <span className="header-title"><b>CSWDO - Binan City</b></span>
             </div>
 
-            <div className="filter-category">
-              <header className="category-header" onClick={() => toggleAccordion('sex')}>Sex <span>{openCategories['sex'] ? '▲' : '▼'}</span></header>
-              <div className="category-checklist" style={{ display: openCategories['sex'] ? 'block' : 'none' }}>
-                {["Female", "Male"].map(opt => (
-                  <label className="checkbox-item" key={opt}><input type="checkbox" checked={filters.sex.includes(opt)} onChange={() => handleFilterToggle('sex', opt)} /> {opt}</label>
-                ))}
+            <div className="dropdown" onMouseLeave={() => setUserDropdownOpen(false)}>
+              <button className="btn" style={{color: 'white', background: 'none'}} onClick={() => setUserDropdownOpen(!userDropdownOpen)}>
+                Username &#9662;
+              </button>
+              <div className="dropdown-content user-dropdown" style={{display: userDropdownOpen ? 'block' : 'none'}}>
+                <a href="#" style={{display:'block', padding: '8px', textDecoration:'none', color:'#333'}}>Profile</a>
+                <a href="#" id="logoutBtn" style={{display:'block', padding: '8px', textDecoration:'none', color:'red', borderTop: '1px solid #eee'}}>Logout</a>
               </div>
             </div>
+          </header>
 
-            <div className="filter-category">
-              <header className="category-header" onClick={() => toggleAccordion('place')}>Barangay <span>{openCategories['place'] ? '▲' : '▼'}</span></header>
-              <div className="category-checklist" style={{ display: openCategories['place'] ? 'block' : 'none', maxHeight: '250px', overflowY: 'auto' }}>
-                {["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mampalasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-Soro", "Timbao", "Tubigan", "Zapote"].map(opt => (
-                  <label className="checkbox-item" key={opt}><input type="checkbox" checked={filters.place.includes(opt)} onChange={() => handleFilterToggle('place', opt)} /> {opt}</label>
-                ))}
-              </div>
-            </div>
-
-            <div className="filter-category">
-              <header className="category-header" onClick={() => toggleAccordion('disability')}>Disabilities <span>{openCategories['disability'] ? '▲' : '▼'}</span></header>
-              <div className="category-checklist" style={{ display: openCategories['disability'] ? 'block' : 'none' }}>
-                {["None", "Physical", "Intellectual", "Learning", "Visual", "Mental", "Psychosocial", "Deaf/Hard of Hearing", "Speech and Language Impairment", "Cancer", "Rare Diseases"].map(opt => (
-                  <label className="checkbox-item" key={opt}><input type="checkbox" checked={filters.disabilities.includes(opt)} onChange={() => handleFilterToggle('disabilities', opt)} /> {opt}</label>
-                ))}
-              </div>
-            </div>
-
-            <div className="filter-category">
-              <header className="category-header" onClick={() => toggleAccordion('illness')}>Critical Illness <span>{openCategories['illness'] ? '▲' : '▼'}</span></header>
-              <div className="category-checklist" style={{ display: openCategories['illness'] ? 'block' : 'none' }}>
-                {["None", "Cancer", "Cardio-vascular Disease", "Paralysis", "Organ Failure", "Others"].map(opt => (
-                  <label className="checkbox-item" key={opt}><input type="checkbox" checked={filters.illness.includes(opt)} onChange={() => handleFilterToggle('illness', opt)} /> {opt}</label>
-                ))}
-              </div>
-            </div>
-
-            <div className="filter-footer">
-              <button className="btn-clear-all" onClick={clearFilters}>Clear All</button>
-              <button className="btn-apply" onClick={applyFilter}>Apply Filter</button>
-            </div>
-          </div>
-        </div>
-
-        <div className="bottom_navi">
-          <div style={{ display: 'flex', gap: '20px' }}>
-            <button className="page_layout" onClick={() => setLayout2Pages(!layout2Pages)}>
-                <img src="/window.svg" width="20" height="20" style={{ filter: 'invert(1)' }} alt="layout" />
-                {layout2Pages ? "View as 1 Page" : "View as 2 Pages"}
+          {/* ACTION BAR */}
+          <div className="action-bar">
+            <button className="btn btn-filter" onClick={() => router.push('/table')}>
+              <img src="/back.png" alt="backbutton" className="back-Icon" />
             </button>
             
-            <button className="page_layout" onClick={() => setIsFilterOpen(!isFilterOpen)} style={{ background: isFilterOpen ? 'rgba(255,255,255,0.2)' : 'transparent' }}>
-                <img src="/file.svg" width="20" height="20" style={{ filter: 'invert(1)' }} alt="filter" />
-                Toggle Filters
+            <div className="dropdown" id="paperSize" onMouseLeave={() => setPaperDropdownOpen(false)}>
+              <button className={`btn btn-paper ${paperDropdownOpen ? 'show' : ''}`} onClick={() => setPaperDropdownOpen(!paperDropdownOpen)}>
+                Paper Size
+              </button>
+              <div className={`paper-choice-dropdown ${paperDropdownOpen ? 'show' : 'hide'}`}>
+                <button className="size btn-a4" onClick={() => {setPaperSize('a4'); setPaperDropdownOpen(false)}}>A4</button>
+                <button className="size btn-letter" onClick={() => {setPaperSize('letter'); setPaperDropdownOpen(false)}}>Letter</button>
+                <button className="size btn-long" onClick={() => {setPaperSize('long'); setPaperDropdownOpen(false)}}>Long</button>
+              </div>
+            </div>
+
+            <button className="btn btn-print" onClick={() => window.print()}>Print Report</button>
+            <button id="downloadPdf" className="btn btn-download" style={{background: '#34a853', color: 'white'}} onClick={downloadPDF}>Download</button>
+          </div>
+
+          {/* BOTTOM NAV */}
+          <div className="bottom_navi">
+            <button className="page_layout" onClick={() => setLayout2Pages(!layout2Pages)} id="layoutBtn" style={{background: 'none', border: 'none'}}>
+              <img src="/page_layout.png" width="25" height="30" style={{margin:'7px', cursor: 'pointer'}} alt="layout" onError={(e) => { e.currentTarget.src = '/window.svg'; e.currentTarget.style.filter='invert(1)'; }}/>
             </button>
+            <div className="zoom">
+              <p>Zoom</p>
+              <select value={zoom} onChange={(e) => setZoom(e.target.value)} style={{borderRadius: '4px', padding: '2px', color: '#333'}}>
+                <option value="0.5">50%</option>
+                <option value="0.75">75%</option>
+                <option value="1">100%</option>
+                <option value="1.5">150%</option>
+                <option value="1.75">175%</option>
+                <option value="2">200%</option>
+              </select>
+            </div>
           </div>
 
-          <div className="zoom">
-            <p style={{ margin: 0 }}>Zoom:</p>
-            <select value={zoom} onChange={(e) => setZoom(e.target.value)}>
-              <option value="0.5">50%</option>
-              <option value="0.75">75%</option>
-              <option value="1">100%</option>
-              <option value="1.5">150%</option>
-              <option value="1.75">175%</option>
-              <option value="2">200%</option>
-            </select>
+          {/* PAGES CONTAINER */}
+          <div id="pagesContainer" ref={pagesContainerRef} className={layout2Pages ? 'two-page' : ''} style={{ transform: `scale(${zoom})` }}>
+            {isLoading && <h2 style={{ marginTop: '50px', textAlign: 'center' }}>Loading Data...</h2>}
           </div>
+
+          {/* FILTER */}
+          <div className="filter_all">
+            <div className={`filter-group-container ${isFilterOpen ? '' : 'closed'}`}>
+              <div className="filter-header-icons">
+                <button className="btn btn-filter" onClick={() => setIsFilterOpen(!isFilterOpen)} style={{backgroundColor: '#512da8', color: 'white'}}>
+                  <img src="/back.png" alt="back" className="back-Icon" style={{filter: 'brightness(0) invert(1)'}} />
+                  <span style={{fontSize: '15px'}}>⚙ FILTER</span>
+                </button>
+              </div>
+
+              <div className={`filter-category ${openCategories['sex'] ? 'active' : ''}`} style={{marginTop: '20px'}}>
+                <div className="category-header" onClick={() => toggleAccordion('sex')}>
+                  <span className="Gender-header">Gender</span>
+                  <span className="category-indicator">▼</span>
+                </div>
+                <div className="category-checklist" id="genderChecklist">
+                  {["Female", "Male"].map(opt => (
+                      <div className="checkbox-item" key={opt}>
+                        <input type="checkbox" id={`g-${opt}`} value={opt} checked={filters.sex.includes(opt)} onChange={() => handleFilterToggle('sex', opt)} />
+                        <label htmlFor={`g-${opt}`}>{opt}</label>
+                      </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={`filter-category ${openCategories['place'] ? 'active' : ''}`}>
+                <div className="category-header" onClick={() => toggleAccordion('place')}>
+                  <span className="Barangay-header">Barangay</span>
+                  <span className="category-indicator">▼</span>
+                </div>
+                <div className="category-checklist" id="barangayChecklist">
+                  {["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mampalasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-Soro", "Timbao", "Tubigan", "Zapote"].map(opt => (
+                      <div className="checkbox-item" key={opt}>
+                        <input type="checkbox" id={`b-${opt}`} value={opt} checked={filters.place.includes(opt)} onChange={() => handleFilterToggle('place', opt)} />
+                        <label htmlFor={`b-${opt}`}>{opt}</label>
+                      </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={`filter-category ${openCategories['disabilities'] ? 'active' : ''}`}>
+                <div className="category-header" onClick={() => toggleAccordion('disabilities')}>
+                  <span className="disability-header">Disability/Special Needs</span>
+                  <span className="category-indicator">▼</span>
+                </div>
+                <div className="category-checklist" id="disabilityChecklist">
+                  {["None", "Physical", "Intellectual", "Learning", "Visual", "Mental", "Psychosocial", "Deaf/Hard of Hearing", "Speech and Language Impairment", "Cancer", "Rare Diseases"].map(opt => (
+                      <div className="checkbox-item" key={opt}>
+                        <input type="checkbox" id={`dis-${opt}`} value={opt} checked={filters.disabilities.includes(opt)} onChange={() => handleFilterToggle('disabilities', opt)} />
+                        <label htmlFor={`dis-${opt}`}>{opt}</label>
+                      </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className={`filter-category ${openCategories['illness'] ? 'active' : ''}`}>
+                <div className="category-header" onClick={() => toggleAccordion('illness')}>
+                  <span className="illness-header">Critical Illness</span>
+                  <span className="category-indicator">▼</span>
+                </div>
+                <div className="category-checklist" id="illnessChecklist">
+                  {["None", "Cancer", "Cardio-vascular Disease", "Paralysis", "Organ Failure", "Others"].map(opt => (
+                      <div className="checkbox-item" key={opt}>
+                        <input type="checkbox" id={`ill-${opt}`} value={opt} checked={filters.illness.includes(opt)} onChange={() => handleFilterToggle('illness', opt)} />
+                        <label htmlFor={`ill-${opt}`}>{opt}</label>
+                      </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="filter-footer">
+                <button className="btn-clear-all" onClick={clearFilters}>Clear All</button>
+                <button className="btn-apply" onClick={applyFilter}>Apply</button>
+              </div>
+            </div>
+          </div>
+
         </div>
-
       </div>
-    </div>
+    </>
   );
 }

@@ -2,12 +2,12 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow: auto
 }
 
 #__next {
   height: 100%;
-  overflow: hidden;
+
 }
 
 /*Main Dashboard Header*/
@@ -46,7 +46,7 @@ html, body {
   border-radius: 8px; 
   box-shadow: 0px 8px 24px rgba(0,0,0,0.2); 
   border: 1px solid #ccc; 
-  overflow: hidden; 
+  overflow: auto; 
    z-index: 100000;
 }
 .dashboardHeader .dropdownItem { display: block; padding: 12px 16px; text-decoration: none; color: black; }
@@ -69,7 +69,7 @@ html, body {
 /* ================= ANALYTICS PAGE ================= */
 .analyticsWrapper, .analyticsWrapper * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
 .analyticsWrapper { background-color: #0f111a; display: flex; justify-content: center; min-height: 100vh; }
-.analyticsWrapper .pageContainer { background-color: white; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: hidden; }
+.analyticsWrapper .pageContainer { background-color: white; width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: auto; }
 .analyticsWrapper table { width: 100%; border-collapse: collapse; }
 .analyticsWrapper th, .analyticsWrapper td { border: 1px solid #ccc; padding: 12px; text-align: left; }
 .analyticsWrapper th { background-color: #f8f8f8; }
@@ -606,3 +606,83 @@ html, body {
 .addWrapper .modal-btn { padding: 12px 35px; border: none; border-radius: 25px; font-size: 1rem; font-weight: bold; cursor: pointer; }
 .addWrapper .modal-btn.yes { background: #d32f2f; color: white; }
 .addWrapper .modal-btn.no { background: #bbb; color: white; }
+
+/* ========================================================= */
+/* ANALYTICS PAGE CSS - STRICTLY SCOPED TO .analyticsRoot    */
+/* ========================================================= */
+
+.analyticsRoot {
+  box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #0f111a; display: flex; justify-content: center; min-height: 100vh;
+}
+.analyticsRoot * { box-sizing: border-box; }
+
+.analyticsRoot .page-container { background-color: #0f111a; width: 100%; display: flex; flex-direction: column; overflow: auto; gap: 20px; min-height: 100vh;}
+.analyticsRoot .two-page { display: grid !important; grid-template-columns: repeat(2, auto); justify-content: center; gap: 20px; }
+
+/* HEADER */
+.analyticsRoot .header { background-color: #a68cb0; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8e6e9e; z-index: 1000; }
+.analyticsRoot .header-title { color: white; }
+.analyticsRoot .header-left { display: flex; align-items: center; gap: 15px; }
+.analyticsRoot .logo-box { width: 50px; height: 50px; background-color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.analyticsRoot .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+
+/* DROPDOWN */
+.analyticsRoot .dropdown { position: relative; display: inline-block; }
+.analyticsRoot .dropdown-content { display: none; position: absolute; background-color: white; min-width: 280px; box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2); z-index: 100; border: 1px solid #ccc; border-radius: 8px; padding: 20px; margin-top: 5px; }
+.analyticsRoot .dropdown.show .dropdown-content { display: block; }
+.analyticsRoot .user-dropdown { right: 0; min-width: 150px; padding: 0;}
+
+/* ACTION BAR */
+.analyticsRoot .action-bar { padding: 25px; display: flex; gap: 12px; align-items: center; background: white;}
+.analyticsRoot .btn { padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; gap: 8px;}
+.analyticsRoot .btn-filter { background-color: #f1f1f1; color: #333; border: 1px solid #ccc; padding: 8px 18px; }
+.analyticsRoot .btn-paper { background-color: #512da8; }
+.analyticsRoot .btn-print { background-color: #8bc34a; }
+.analyticsRoot .btn-download { background-color: #ff854c; }
+
+.analyticsRoot .paper-choice-dropdown { display: none; position: absolute; background-color: #512da8; min-width: 100px; z-index: 100; padding: 10px; flex-direction: column; gap: 10px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; top: 100%; left: 0;}
+.analyticsRoot .paper-choice-dropdown.show { display: flex; }
+.analyticsRoot .size { border: none; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; width: 94px; height: 25px; border-radius: 20px; background-color: #ff854c; }
+
+/* PAPER & PAGES */
+.analyticsRoot #pagesContainer { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 40px; margin-bottom: 50px; transform-origin: top center; padding: 20px;}
+.analyticsRoot .page { background-color: white; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); display: flex; flex-direction: column; gap: 20px; }
+.analyticsRoot .page h1 { text-align: center; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #a68cb0; padding-bottom: 10px;}
+
+/* CHARTS & TABLES */
+.analyticsRoot .charts { display: flex; flex-direction: column; gap: 30px; align-items: center; width: 100%;}
+.analyticsRoot .chartCard { width: 100%; max-width: 600px; display: flex; flex-direction: column; align-items: center; }
+.analyticsRoot .chartCard h4 { margin-bottom: 15px; }
+.analyticsRoot .chart-container { width: 100%; height: 300px; position: relative; }
+
+.analyticsRoot table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center;}
+.analyticsRoot th, .analyticsRoot td { border: 1px solid black; padding: 6px; }
+.analyticsRoot th { background-color: #f2f2f2; }
+
+/* BOTTOM NAVI */
+.analyticsRoot .bottom_navi { width: 100%; height: 50px; background-color: #a68cb0; position: fixed; bottom: 0; display: flex; justify-content: space-between; align-items: center; z-index: 999; padding: 0 50px; }
+.analyticsRoot .page_layout { background: none; border: none; cursor: pointer; display: flex; align-items: center; color: white; font-weight: bold; gap: 10px;}
+.analyticsRoot .zoom { display: flex; align-items: center; gap: 10px; color: white; font-weight: bold; }
+.analyticsRoot .zoom select { padding: 4px; border-radius: 4px; }
+
+/* FILTER SIDEBAR */
+.analyticsRoot .filter_all { width: 340px; background-color: white; height: 100vh; position: fixed; right: -340px; top: 0; z-index: 2000; transition: right 0.3s ease; box-shadow: -5px 0 15px rgba(0,0,0,0.2); display: flex; flex-direction: column;}
+.analyticsRoot .filter_all.open { right: 0; }
+.analyticsRoot .filter-header-icons { padding: 20px; border-bottom: 1px solid #ccc; display: flex; justify-content: space-between; align-items: center;}
+.analyticsRoot .filter-content { padding: 20px; overflow-y: auto; flex: 1; }
+.analyticsRoot .filter-category { margin-bottom: 15px; border: 1px solid #e0dce5; border-radius: 8px; overflow: hidden;}
+.analyticsRoot .category-header { background-color: #ede7f6; padding: 12px 16px; font-weight: bold; display: flex; justify-content: space-between; cursor: pointer; user-select: none;}
+.analyticsRoot .category-checklist { display: none; padding: 15px; background: white; max-height: 200px; overflow-y: auto;}
+.analyticsRoot .category-checklist.show { display: block; }
+.analyticsRoot .checkbox-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 14px; }
+.analyticsRoot .filter-footer { padding: 20px; border-top: 1px solid #ccc; display: flex; justify-content: space-between; }
+.analyticsRoot .btn-apply { background-color: #512da8; color: white; padding: 10px 25px; border-radius: 20px; border: none; cursor: pointer; font-weight: bold;}
+.analyticsRoot .btn-clear-all { background: none; border: none; color: #666; text-decoration: underline; cursor: pointer; }
+
+@media print {
+  body * { visibility: hidden; }
+  .analyticsRoot #pagesContainer, .analyticsRoot #pagesContainer * { visibility: visible; }
+  .analyticsRoot #pagesContainer { position: absolute; left: 0; top: 0; transform: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important;}
+  .analyticsRoot .page { box-shadow: none; margin: 0; page-break-after: always; width: 100%; border: none;}
+}

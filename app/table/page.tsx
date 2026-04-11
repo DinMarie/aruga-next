@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import { useReactToPrint } from 'react-to-print';
-import TestDataUtil from '@/components/TestDataUtil';
 
 // 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
@@ -54,10 +53,13 @@ export default function TablePage() {
   const [otherInputs, setOtherInputs] = useState({ religion: "", ip: "", illness: "" });
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 13;
+  
+  // Ref for the printable component
   const componentRef = useRef<HTMLDivElement>(null);
 
+  // FIXED: Correct React-to-Print v3 Syntax
   const performPrint = useReactToPrint({
-    contentRef: componentRef,
+    contentRef: componentRef, 
     documentTitle: 'Aruga_Summary_Report',
     onBeforePrint: () => new Promise<void>((resolve) => {
       setNotification({ message: "⏳ Preparing report, please wait...", type: 'loading' });
@@ -197,6 +199,15 @@ export default function TablePage() {
         .tablePageRoot .modal-btn { padding: 12px 35px; border: none; border-radius: 25px; font-size: 1rem; font-weight: bold; cursor: pointer; }
         .tablePageRoot .yes { background: #d32f2f; color: white; }
         .tablePageRoot .no { background: #bbb; color: white; }
+
+        /* FIXED: Force the iframe to allow scrolling specifically during the print process */
+        @media print {
+            html, body {
+                height: auto !important;
+                overflow: visible !important;
+                background-color: white !important;
+            }
+        }
       `}} />
 
       {notification && (
@@ -219,8 +230,6 @@ export default function TablePage() {
             </div>
           </div>
         </header>
-
-        
 
         {showLogoutModal && (
           <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
@@ -345,9 +354,9 @@ export default function TablePage() {
           </div>
         </div>
 
-        {/* Hidden Printable Container */}
+        {/* FIXED: Reverted back to the official react-to-print standard wrapper */}
         <div style={{ display: 'none' }}>
-          <div ref={componentRef} style={{ fontFamily: 'Segoe UI, Arial, sans-serif', padding: '30px' }}>
+          <div ref={componentRef} style={{ fontFamily: 'Segoe UI, Arial, sans-serif', padding: '30px', background: 'white' }}>
 
             {/* Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
