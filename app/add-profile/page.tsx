@@ -9,7 +9,7 @@ import { db } from '../../lib/firebase';
 
 const codeDictionaries: Record<string, Record<string, string>> = {
     // ✅ ADDED: "inc" as a shortcut for Iglesia ni Cristo
-    religion: { "none": "0", "roman catholic": "1","catholic":"1", "islam": "2", "iglesia ni cristo": "3", "inc": "3", "aglipay": "4", "seventh day adventist": "5", "bible baptist church": "6", "jehova's witness": "7", "united methodists church": "8", "tribal religions": "9" },
+    religion: { "none": "0", "roman catholic": "1","catholic":"1", "islam": "2", "iglesia ni cristo": "3", "inc": "3", "aglipay": "4", "seventh day adventist": "5", "bible baptist church": "6", "jehova's witness": "7", "united methodists church": "8", "tribal religions": "9","tribal": "9","tribal religion": "9" },
     ip: { "non-ip": "0", "aeta": "1", "ati": "2", "badjao": "3", "bago": "4", "batak": "5", "bukidnon": "6", "b'laan": "7", "cimaron": "8", "duyonen": "9", "dumagat": "10", "ibaloi": "11", "ibanag": "12", "itom": "13", "kankanaey": "14", "mandaya": "15", "mangyan": "16", "manobo": "17", "palawano": "18", "pullon": "19", "subanen": "20", "tagbanuas": "21", "tau't bato": "22", "teduray": "23", "t'boli": "24" },
     sex: { "male": "1", "female": "2" },
     education: { "without formal education": "1", "elementary": "2", "elementary graduate": "3", "high school": "4", "high school graduate": "5", "vocational course": "6", "vocational course graduate": "7", "college": "8", "college graduate": "9", "post college degree": "10" },
