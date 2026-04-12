@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import { useReactToPrint } from 'react-to-print';
+import TestDataUtil from '@/components/TestDataUtil';
 
 const FILTER_OPTIONS = {
   barangay: ["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mamplasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-soro", "Timbao", "Tubigan", "Zapote"],
@@ -352,6 +353,7 @@ export default function TablePage() {
                 ))}
                 <button suppressHydrationWarning className="pg-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || undefined}>&gt;</button>
               </div>
+            
             </footer>
           </div>
         </div>

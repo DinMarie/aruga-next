@@ -96,8 +96,8 @@ export default function SummaryDashboard() {
     loadData();
   }, []);
 
-  // 2. Data Processing
-  const { chartData, paragraphs, fullTableData, categoryTables, placesList } = useMemo(() => {
+  // 2. Data Processing & PAGINATION CHUNKING
+  const { chartData, paragraphs, fullTableData, categoryTables, chunkedPlacesList } = useMemo(() => {
     const dCount: any = {};
     const iCount: any = {};
     const pCount: any = {};
@@ -109,33 +109,78 @@ export default function SummaryDashboard() {
     });
 
     const places = [...new Set(filteredRecords.map(r => r.place))].sort((a: any, b: any) => a.localeCompare(b));
+    
+    // Executive Summary
     const paras: string[] = [];
+    const totalPop = filteredRecords.length;
+    
+    const pct = (val: number, total: number) => total > 0 ? ((val/total)*100).toFixed(1) : "0";
 
-    places.forEach(place => {
-      const placeRecords = filteredRecords.filter(r => r.place === place);
-      const totalPopulation = placeRecords.length;
-      if (totalPopulation === 0) return;
+    if (totalPop === 0) {
+      paras.push("<p>No records match the current filter criteria. Please adjust your parameters to generate a summary.</p>");
+    } else {
+      // 1. Executive Overview
+      paras.push(`<h3 style="color: #512da8; margin-bottom: 8px; font-size: 16px;">I. Executive Overview</h3>
+      <p style="margin-bottom: 15px;">The current dataset encompasses a comprehensive registry of <b>${totalPop}</b> individuals across <b>${places.length}</b> distinct barangays within the parameters selected. This analytical report provides a high-level statistical assessment of the demographic distribution, specialized needs, and critical health profiles of the registered population to aid in localized resource allocation and social welfare planning.</p>`);
 
-      const males = placeRecords.filter(r => r.sex === "Male").length;
-      const females = placeRecords.filter(r => r.sex === "Female").length;
+      // 2. Demographics
+      const totalMales = filteredRecords.filter(r => r.sex === 'Male').length;
+      const totalFemales = filteredRecords.filter(r => r.sex === 'Female').length;
+      paras.push(`<h3 style="color: #512da8; margin-bottom: 8px; font-size: 16px;">II. Demographic Composition</h3>
+      <p style="margin-bottom: 15px;">The registered population exhibits a gender distribution consisting of <b>${totalMales}</b> males, representing <b>${pct(totalMales, totalPop)}%</b> of the group, and <b>${totalFemales}</b> females, representing <b>${pct(totalFemales, totalPop)}%</b>. Understanding this foundational demographic baseline is essential for designing gender-responsive social protection programs and health interventions.</p>`);
 
-      const dText = placeRecords.filter(p => p.disabilities !== "None").map(p => `${p.sex.toLowerCase()} with ${p.disabilities.toLowerCase()} disability`);
-      const iText = placeRecords.filter(p => p.illness !== "None").map(p => `${p.sex.toLowerCase()} with ${p.illness.toLowerCase()}`);
+      // 3. Geography
+      const placesCount = Object.entries(pCount).sort((a: any, b: any) => b[1] - a[1]);
+      if (placesCount.length > 0) {
+        const topPlaces = placesCount.slice(0, 5).map(p => `<b>${p[0]}</b> (${p[1]} individuals)`).join(', ');
+        const bottomPlaces = placesCount.slice(-3).map(p => `<b>${p[0]}</b> (${p[1]} individuals)`).join(', ');
+        paras.push(`<h3 style="color: #512da8; margin-bottom: 8px; font-size: 16px;">III. Geographic Distribution</h3>
+        <p style="margin-bottom: 15px;">Population density varies significantly across the constituent barangays. The highest concentration of registered individuals is located in ${topPlaces}. These metrics indicate critical zones that may require prioritized funding, infrastructure development, and logistical support. Conversely, barangays such as ${bottomPlaces} report the lowest registration numbers within this dataset.</p>`);
+      }
 
-      const dString = dText.length > 0 ? `, including <b>${dText.join(", ")}</b>` : "";
-      const iString = iText.length > 0 ? `, including <b>${iText.join(", ")}</b>` : "";
+      // 4. Disability Insights
+      const withDisabilities = filteredRecords.filter(r => r.disabilities !== 'None');
+      if (withDisabilities.length > 0) {
+        const dCountMap: any = {};
+        withDisabilities.forEach(r => dCountMap[r.disabilities] = (dCountMap[r.disabilities] || 0) + 1);
+        const topDisabilities = Object.entries(dCountMap).sort((a: any, b: any) => b[1] - a[1]).slice(0, 5).map((d: any) => `<b>${d[0]}</b> (${d[1]} cases)`).join(', ');
+        paras.push(`<h3 style="color: #512da8; margin-bottom: 8px; font-size: 16px;">IV. Disability & Special Needs Profiling</h3>
+        <p style="margin-bottom: 15px;">A critical component of this assessment is the identification of vulnerable groups. A total of <b>${withDisabilities.length}</b> individuals—accounting for <b>${pct(withDisabilities.length, totalPop)}%</b> of the analyzed population—reported having a recognized disability or special need. The most frequently recorded conditions demanding specialized support include ${topDisabilities}. This data underscores the absolute necessity for targeted inclusive infrastructure and specialized rehabilitative resources.</p>`);
+      } else {
+        paras.push(`<h3 style="color: #512da8; margin-bottom: 8px; font-size: 16px;">IV. Disability & Special Needs Profiling</h3><p style="margin-bottom: 15px;">No disabilities or special needs were reported within the current parameters.</p>`);
+      }
 
-      paras.push(`The Barangay of <b>${place}</b> has a total population of <b>${totalPopulation}</b> residents, consisting of <b>${males}</b> males and <b>${females}</b> females. Among them, <b>${dText.length}</b> individuals have disabilities${dString}. In terms of health, <b>${iText.length}</b> residents have reported illnesses${iString}.`);
-    });
+      // 5. Illness Insights
+      const withIllness = filteredRecords.filter(r => r.illness !== 'None');
+      if (withIllness.length > 0) {
+        const iCountMap: any = {};
+        withIllness.forEach(r => iCountMap[r.illness] = (iCountMap[r.illness] || 0) + 1);
+        const topIllnesses = Object.entries(iCountMap).sort((a: any, b: any) => b[1] - a[1]).slice(0, 5).map((i: any) => `<b>${i[0]}</b> (${i[1]} cases)`).join(', ');
+        paras.push(`<h3 style="color: #512da8; margin-bottom: 8px; font-size: 16px;">V. Critical Health Assessment</h3>
+        <p style="margin-bottom: 15px;">Furthermore, <b>${withIllness.length}</b> individuals (<b>${pct(withIllness.length, totalPop)}%</b>) are currently navigating critical health challenges. The most prevalent life-altering conditions reported are ${topIllnesses}. High instances of these illnesses highlight an urgent need for robust localized healthcare programs, chronic disease management, and accessible medical assistance funds within the community.</p>`);
+      } else {
+        paras.push(`<h3 style="color: #512da8; margin-bottom: 8px; font-size: 16px;">V. Critical Health Assessment</h3><p style="margin-bottom: 15px;">No critical illnesses were reported within the current parameters.</p>`);
+      }
 
-    const chunkedParas: string[][] = [];
-    for (let i = 0; i < paras.length; i += 6) {
-      chunkedParas.push(paras.slice(i, i + 6));
+      // 6. High Risk / Intersectionality
+      const highRisk = filteredRecords.filter(r => r.disabilities !== 'None' && r.illness !== 'None');
+      if (highRisk.length > 0) {
+        paras.push(`<h3 style="color: #e53935; margin-bottom: 8px; font-size: 16px;">VI. High-Risk Intersectionality Assessment</h3>
+        <p style="margin-bottom: 15px;">Cross-tabulation reveals that <b>${highRisk.length}</b> individuals (<b>${pct(highRisk.length, totalPop)}%</b>) are managing <i>both</i> a registered disability and a critical illness simultaneously. These individuals represent the most highly vulnerable segment of the analyzed population, requiring immediate, multi-disciplinary medical intervention and sustained, holistic welfare support.</p>`);
+      }
     }
+
+    const chunkedParas: string[][] = [paras];
 
     const sexes = [...new Set(filteredRecords.map(r => r.sex))].sort();
     const dTypes = [...new Set(filteredRecords.map(r => r.disabilities))].sort();
     const iTypes = [...new Set(filteredRecords.map(r => r.illness))].sort();
+
+    // Safely chunk the Full Table by 10 Barangays per page
+    const safelyChunkedPlaces: string[][] = [];
+    for (let i = 0; i < places.length; i += 10) {
+      safelyChunkedPlaces.push(places.slice(i, i + 10));
+    }
 
     const catTablesData = ["place", "sex", "disabilities", "illness"].map(cat => {
       const counts: any = {};
@@ -147,12 +192,18 @@ export default function SummaryDashboard() {
       };
     });
 
+    // Safely chunk Category Tables to 2 per page
+    const chunkedCatTables: any[][] = [];
+    for (let i = 0; i < catTablesData.length; i += 2) {
+      chunkedCatTables.push(catTablesData.slice(i, i + 2));
+    }
+
     return {
       chartData: { disabilities: dCount, illness: iCount, place: pCount },
       paragraphs: chunkedParas,
       fullTableData: { sexes, dTypes, iTypes },
-      categoryTables: catTablesData,
-      placesList: places
+      categoryTables: chunkedCatTables,
+      chunkedPlacesList: safelyChunkedPlaces
     };
   }, [filteredRecords]);
 
@@ -275,25 +326,23 @@ export default function SummaryDashboard() {
       <style dangerouslySetInnerHTML={{__html: `
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Arial, sans-serif; }
         
-        /* ✅ FIXED: The root spans perfectly between the header and footer, allowing the scrollbars to appear naturally */
         .analytics-root { 
           position: fixed; 
           top: 150px; 
           bottom: 60px; 
           left: 0; 
           right: 0; 
-          background-color: #ffffff; 
+          background-color: #0f111a; 
           display: block; 
           overflow: auto; 
         }
         
-        /* ✅ FIXED: By using fit-content and text-align: center, the pages expand to the right without clipping the left edge! */
         .page-container { 
           background-color: white; 
           min-width: 100%; 
           width: fit-content; 
           min-height: 100%; 
-          box-shadow: 0 10px 30px rgb(255, 255, 255); s
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
           display: block; 
           text-align: center; 
           padding-top: 40px; 
@@ -332,7 +381,7 @@ export default function SummaryDashboard() {
         .user-dropdown a { display: block; padding: 8px; text-decoration: none; color: #333; }
         .user-dropdown a:hover { background-color: #f1f1f1; }
 
-        /* --- Action Bar (FIXED TO TOP) --- */
+        /* --- Action Bar --- */
         .action-bar { padding: 25px; display: flex; gap: 12px; align-items: center; position: fixed; top: 80px; left: 0; width: 100%; height: 70px; background: white; border-bottom: 1px solid #ddd; z-index: 999; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05); }
         .btn { padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center;}
         .btn-paper { background-color: #512da8; }
@@ -355,17 +404,16 @@ export default function SummaryDashboard() {
         .chartCard { width: 100%; margin-bottom: 30px; }
         .chartCard h4 { margin-bottom: 10px; color: #333; font-size: 16px; }
 
-        /* ✅ BULLETPROOF BORDERS: 2px ensures it scales down to exactly 1px at 50% zoom */
         table { width: 100%; border-collapse: separate; border-spacing: 0; border-top: 2px solid #000; border-left: 2px solid #000; margin-bottom: 20px; }
         th, td { border-right: 2px solid #000; border-bottom: 2px solid #000; padding: 8px; text-align: center; font-size: 12px; }
         th { background-color: #f2f2f2; font-weight: bold; text-align: center; }
 
-        /* --- Bottom Navi (Fixed to Bottom) --- */
+        /* --- Bottom Navi --- */
         .bottom_navi { width: 100%; height: 60px; left: 0; background-color: #a68cb0; position: fixed; padding: 0 100px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; bottom: 0px; }
         .zoom { display: flex; align-items: center; gap: 5px; }
         .zoom p { font-size: 15px; font-weight: bold; color: white; margin: 0; }
 
-        /* --- Filter Sidebar (LOCKED TO SCREEN) --- */
+        /* --- Filter Sidebar --- */
         .filter-sidebar-wrapper { position: fixed; top: 150px; right: 0; bottom: 60px; width: 360px; z-index: 998; pointer-events: none; padding: 20px; display: flex; flex-direction: column; }
         
         .filter-group-container { pointer-events: auto; background: white; border: 1px solid #ccc; box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.15); border-radius: 8px; display: flex; flex-direction: column; width: 100%; height: 100%; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); }
@@ -463,21 +511,10 @@ export default function SummaryDashboard() {
                     fontWeight: 'bold'
                   }}
               >
-                <img 
-                    src="/page_layout.png" 
-                    width="18" 
-                    height="22" 
-                    alt="layout icon" 
-                    style={{ filter: layout2Pages ? 'brightness(0) invert(1)' : 'none' }}
-                    onError={(e) => { 
-                        e.currentTarget.src = '/window.svg'; 
-                        e.currentTarget.style.filter = layout2Pages ? 'invert(1)' : 'none'; 
-                    }}
-                />
-                {layout2Pages ? 'Double View' : 'Single View'}
+             
+                {layout2Pages ? 'Double Page' : 'Single Page'}
               </button>
               
-              {/* ✅ The Filter Button safely docked in the footer */}
               <button 
                   className="btn btn-filter" 
                   onClick={() => setIsFilterOpen(!isFilterOpen)} 
@@ -507,100 +544,120 @@ export default function SummaryDashboard() {
           </div>
 
           {/* PAGES CONTAINER */}
-          {/* ✅ FIXED: Now uses the "zoom" style attribute, natively rendering scrollbars perfectly! */}
           <div id="pagesContainer" className={layout2Pages ? 'two-page' : ''} style={{ zoom: zoom }}>
             {isLoading && <h2 style={{ marginTop: '50px', textAlign: 'center' }}>Loading Data...</h2>}
             
             {!isLoading && (
               <>
-                {/* PAGE 1: CHARTS */}
+                {/* ✅ PAGE 1: PIE CHARTS (SPLIT TO PREVENT CUTOFF) */}
                 <div className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
-                  <h1>Disability Records Analytics</h1>
+                  <h1>Disability Records Analytics (Part 1)</h1>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
                     <div className="chartCard">
                         <h4>Disability Summary</h4>
-                        <div style={{ height: '250px', width: '100%' }}><canvas ref={pie1Ref}></canvas></div>
+                        <div style={{ height: '350px', width: '100%' }}><canvas ref={pie1Ref}></canvas></div>
                     </div>
                     <div className="chartCard">
                         <h4>Illness Summary</h4>
-                        <div style={{ height: '250px', width: '100%' }}><canvas ref={pie2Ref}></canvas></div>
-                    </div>
-                    <div className="chartCard">
-                        <h4>Population Summary</h4>
-                        <div style={{ height: '300px', width: '100%' }}><canvas ref={barRef}></canvas></div>
+                        <div style={{ height: '350px', width: '100%' }}><canvas ref={pie2Ref}></canvas></div>
                     </div>
                   </div>
                 </div>
 
-                {/* PAGES 2+: PARAGRAPHS */}
+                {/* ✅ PAGE 2: BAR CHART (SPLIT TO PREVENT CUTOFF) */}
+                <div className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
+                  <h1>Disability Records Analytics (Part 2)</h1>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', flex: 1 }}>
+                    <div className="chartCard" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <h4>Population Summary</h4>
+                        <div style={{ flex: 1, minHeight: '500px', width: '100%' }}><canvas ref={barRef}></canvas></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* ✅ PAGE 3: NEW EXPANDED EXECUTIVE SUMMARY */}
                 {paragraphs.map((paraChunk, idx) => (
                   <div key={`para-page-${idx}`} className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
-                    <h1>Summary Paragraphs</h1>
-                    {paraChunk.map((p, i) => (
-                      <p key={i} dangerouslySetInnerHTML={{ __html: p }} style={{ margin: '10px 0', textAlign: 'justify', fontSize: '13px', lineHeight: '1.6' }}></p>
-                    ))}
+                    <h1>Executive Summary</h1>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '10px', textAlign: 'left' }}>
+                      {paraChunk.map((p, i) => (
+                        <div key={i} style={{ 
+                          backgroundColor: '#fdfdfd', 
+                          padding: '15px 20px', 
+                          borderRadius: '8px',
+                          border: '1px solid #eaeaea',
+                          fontSize: '14px',
+                          lineHeight: '1.6',
+                          color: '#333'
+                        }} dangerouslySetInnerHTML={{ __html: p }}></div>
+                      ))}
+                    </div>
                   </div>
                 ))}
 
-                {/* FULL TABLE PAGE */}
-                <div className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
-                  <h1>Full Table Summary</h1>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th rowSpan={2} style={{verticalAlign: 'middle'}}>Barangay</th>
-                        <th rowSpan={2} style={{verticalAlign: 'middle'}}>Sex</th>
-                        <th colSpan={fullTableData.dTypes.length + 1}>Disabilities</th>
-                        <th colSpan={fullTableData.iTypes.length}>Critical Illness</th>
-                      </tr>
-                      <tr>
-                        <th>Population</th>
-                        {fullTableData.dTypes.map(d => <th key={d}>{d}</th>)}
-                        {fullTableData.iTypes.map(i => <th key={i}>{i}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {placesList.map(place => 
-                        fullTableData.sexes.map((sex, index) => {
-                          const sexRecords = filteredRecords.filter(r => r.place === place && r.sex === sex);
-                          if (sexRecords.length === 0) return null;
-                          return (
-                            <tr key={`${place}-${sex}`}>
-                              {index === 0 && <td rowSpan={2} style={{verticalAlign: 'middle'}}><b>{place}</b></td>}
-                              <td>{sex}</td>
-                              <td style={{textAlign: 'center'}}><b>{sexRecords.length}</b></td>
-                              {fullTableData.dTypes.map(d => <td key={d} style={{textAlign: 'center'}}>{sexRecords.filter(r => r.disabilities === d).length}</td>)}
-                              {fullTableData.iTypes.map(i => <td key={i} style={{textAlign: 'center'}}>{sexRecords.filter(r => r.illness === i).length}</td>)}
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* CATEGORY TABLES PAGE */}
-                <div className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
-                  <h1>Category Tables</h1>
-                  {categoryTables.map((catData, idx) => (
-                    <table key={idx} style={{ marginBottom: '30px' }}>
+                {/* FULL TABLE PAGES CHUNKED SAFELY (Max 10 Barangays per page) */}
+                {chunkedPlacesList.map((placeChunk, pageIdx) => (
+                  <div key={`full-table-page-${pageIdx}`} className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
+                    <h1>Full Table Summary {pageIdx > 0 ? `(Part ${pageIdx + 1})` : ''}</h1>
+                    <table>
                       <thead>
                         <tr>
-                          <th>{catData.label}</th>
-                          <th>Population</th>
+                          <th rowSpan={2} style={{verticalAlign: 'middle'}}>Barangay</th>
+                          <th rowSpan={2} style={{verticalAlign: 'middle'}}>Sex</th>
+                          <th colSpan={fullTableData.dTypes.length + 1}>Disabilities</th>
+                          <th colSpan={fullTableData.iTypes.length}>Critical Illness</th>
+                        </tr>
+                        <tr>
+                          <th>Pop.</th>
+                          {fullTableData.dTypes.map(d => <th key={d}>{d}</th>)}
+                          {fullTableData.iTypes.map(i => <th key={i}>{i}</th>)}
                         </tr>
                       </thead>
                       <tbody>
-                        {catData.counts.map(([type, count]: any) => (
-                          <tr key={type}>
-                            <td style={{ textAlign: 'left' }}>{type}</td>
-                            <td style={{ textAlign: 'center' }}><b>{count}</b></td>
-                          </tr>
-                        ))}
+                        {placeChunk.map(place => 
+                          fullTableData.sexes.map((sex, index) => {
+                            const sexRecords = filteredRecords.filter(r => r.place === place && r.sex === sex);
+                            if (sexRecords.length === 0) return null;
+                            return (
+                              <tr key={`${place}-${sex}`}>
+                                {index === 0 && <td rowSpan={2} style={{verticalAlign: 'middle'}}><b>{place}</b></td>}
+                                <td>{sex}</td>
+                                <td style={{textAlign: 'center'}}><b>{sexRecords.length}</b></td>
+                                {fullTableData.dTypes.map(d => <td key={d} style={{textAlign: 'center'}}>{sexRecords.filter(r => r.disabilities === d).length}</td>)}
+                                {fullTableData.iTypes.map(i => <td key={i} style={{textAlign: 'center'}}>{sexRecords.filter(r => r.illness === i).length}</td>)}
+                              </tr>
+                            );
+                          })
+                        )}
                       </tbody>
                     </table>
-                  ))}
-                </div>
+                  </div>
+                ))}
+
+                {/* CATEGORY TABLES PAGES CHUNKED SAFELY (Max 2 Categories per page) */}
+                {categoryTables.map((catChunk, pageIdx) => (
+                  <div key={`cat-table-page-${pageIdx}`} className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
+                    <h1>Category Tables {pageIdx > 0 ? `(Part ${pageIdx + 1})` : ''}</h1>
+                    {catChunk.map((catData: any, idx: number) => (
+                      <table key={idx} style={{ marginBottom: '30px' }}>
+                        <thead>
+                          <tr>
+                            <th>{catData.label}</th>
+                            <th>Population</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {catData.counts.map(([type, count]: any) => (
+                            <tr key={type}>
+                              <td style={{ textAlign: 'left' }}>{type}</td>
+                              <td style={{ textAlign: 'center' }}><b>{count}</b></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    ))}
+                  </div>
+                ))}
               </>
             )}
           </div>
