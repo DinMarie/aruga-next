@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import { useReactToPrint } from 'react-to-print';
-import TestDataUtil from '@/components/TestDataUtil';
 
+// 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
   barangay: ["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mamplasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-soro", "Timbao", "Tubigan", "Zapote"],
   gender: ["Female", "Male"],
@@ -53,11 +53,12 @@ export default function TablePage() {
   const [otherInputs, setOtherInputs] = useState({ religion: "", ip: "", illness: "" });
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 13;
-
+  
+  // Ref for the printable component
   const componentRef = useRef<HTMLDivElement>(null);
 
   const performPrint = useReactToPrint({
-    contentRef: componentRef,
+    contentRef: componentRef, 
     documentTitle: 'Aruga_Summary_Report',
     onBeforePrint: () => new Promise<void>((resolve) => {
       setNotification({ message: "⏳ Preparing report, please wait...", type: 'loading' });
@@ -111,22 +112,44 @@ export default function TablePage() {
     setOtherInputs({ religion: "", ip: "", illness: "" });
   };
 
+  // ✅ FIXED: Advanced filtering with ñ normalization
   const displayedProfiles = profiles.filter(profile => {
+    // Normalization helper: lowercase and convert all "ñ" to "n"
+    const normalize = (str: string) => str.toLowerCase().replace(/ñ/g, 'n');
+
     let matchSearch = true;
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      matchSearch = !!(profile.name?.toLowerCase().includes(term) || profile.address?.toLowerCase().includes(term));
+      const term = normalize(searchTerm);
+      matchSearch = !!(normalize(profile.name || "").includes(term) || normalize(profile.address || "").includes(term));
     }
+
     const isMatch = (selectedList: string[], dbValue: string = "") => {
       if (selectedList.length === 0) return true;
-      const cleanDbValue = dbValue.trim().toLowerCase();
+      const cleanDbValue = normalize(dbValue);
       return selectedList.some(filterItem => {
-        if (filterItem.toLowerCase() === cleanDbValue) return true;
+        if (normalize(filterItem) === cleanDbValue) return true;
         const aliases = ALIAS_MAP[filterItem] || [];
-        return aliases.some(alias => alias.toLowerCase() === cleanDbValue);
+        return aliases.some(alias => normalize(alias) === cleanDbValue);
       });
     };
-    const matchBarangay = selectedFilters.barangay.length === 0 || selectedFilters.barangay.some(b => profile.address?.toLowerCase().includes(b.toLowerCase()));
+
+    const matchBarangay = selectedFilters.barangay.length === 0 || selectedFilters.barangay.some(b => {
+      const address = normalize(profile.address || "");
+      const target = normalize(b); // "biñan" becomes "binan", "santo niño" becomes "santo nino"
+
+      // Special logic to prevent Biñan City from falsely triggering Barangay Biñan
+      if (target === "binan") {
+        const strippedAddress = address
+          .replace(/binan city/g, "")
+          .replace(/binan, laguna/g, "")
+          .replace(/binan laguna/g, "");
+          
+        return strippedAddress.includes("binan");
+      }
+
+      return address.includes(target);
+    });
+
     return matchSearch && matchBarangay && isMatch(selectedFilters.gender, profile.sex) && isMatch(selectedFilters.religion, profile.religion) && isMatch(selectedFilters.ip, profile.ip) && isMatch(selectedFilters.disability, profile.disability) && isMatch(selectedFilters.illness, profile.illness);
   });
 
@@ -198,32 +221,12 @@ export default function TablePage() {
         .tablePageRoot .yes { background: #d32f2f; color: white; }
         .tablePageRoot .no { background: #bbb; color: white; }
 
-        /* ✅ KEY FIX: Hide the print template visually but keep it in the DOM layout */
-        .print-only {
-          position: absolute;
-          left: -9999px;
-          top: 0;
-          width: 1px;
-          height: 1px;
-          overflow: hidden;
-          pointer-events: none;
-        }
-
         @media print {
-          html, body {
-            height: auto !important;
-            overflow: visible !important;
-            background-color: white !important;
-          }
-          /* ✅ Make the print template fully visible and full-width when printing */
-          .print-only {
-            position: static !important;
-            left: auto !important;
-            top: auto !important;
-            width: 100% !important;
-            height: auto !important;
-            overflow: visible !important;
-          }
+            html, body {
+                height: auto !important;
+                overflow: visible !important;
+                background-color: white !important;
+            }
         }
       `}} />
 
@@ -347,19 +350,31 @@ export default function TablePage() {
             <footer className="footer-controls">
               <button className="btn-print" onClick={() => performPrint && performPrint()}>PRINT REPORT</button>
               <div className="pagination">
-                <button suppressHydrationWarning className="pg-btn" onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1 || undefined}>&lt;</button>
+                <button
+                  suppressHydrationWarning
+                  className="pg-btn"
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  disabled={currentPage === 1 || undefined}
+                >&lt;</button>
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
-                  <button key={pageNum} className={`pg-btn ${currentPage === pageNum ? 'active' : ''}`} onClick={() => setCurrentPage(pageNum)}>{pageNum}</button>
+                  <button
+                    key={pageNum}
+                    className={`pg-btn ${currentPage === pageNum ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >{pageNum}</button>
                 ))}
-                <button suppressHydrationWarning className="pg-btn" onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages || undefined}>&gt;</button>
+                <button
+                  suppressHydrationWarning
+                  className="pg-btn"
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  disabled={currentPage === totalPages || undefined}
+                >&gt;</button>
               </div>
-            
             </footer>
           </div>
         </div>
 
-        {/* ✅ FIXED: Use off-screen positioning instead of display:none */}
-        <div className="print-only">
+        <div style={{ display: 'none' }}>
           <div ref={componentRef} style={{ fontFamily: 'Segoe UI, Arial, sans-serif', padding: '30px', background: 'white' }}>
 
             {/* Header */}

@@ -8,13 +8,21 @@ import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 
 const codeDictionaries: Record<string, Record<string, string>> = {
-    religion: { "none": "0", "roman catholic": "1", "islam": "2", "iglesia ni cristo": "3", "aglipay": "4", "seventh day adventist": "5", "bible baptist church": "6", "jehova's witness": "7", "united methodists church": "8", "tribal religions": "9" },
+    // ✅ ADDED: "inc" as a shortcut for Iglesia ni Cristo
+    religion: { "none": "0", "roman catholic": "1","catholic":"1", "islam": "2", "iglesia ni cristo": "3", "inc": "3", "aglipay": "4", "seventh day adventist": "5", "bible baptist church": "6", "jehova's witness": "7", "united methodists church": "8", "tribal religions": "9" },
     ip: { "non-ip": "0", "aeta": "1", "ati": "2", "badjao": "3", "bago": "4", "batak": "5", "bukidnon": "6", "b'laan": "7", "cimaron": "8", "duyonen": "9", "dumagat": "10", "ibaloi": "11", "ibanag": "12", "itom": "13", "kankanaey": "14", "mandaya": "15", "mangyan": "16", "manobo": "17", "palawano": "18", "pullon": "19", "subanen": "20", "tagbanuas": "21", "tau't bato": "22", "teduray": "23", "t'boli": "24" },
     sex: { "male": "1", "female": "2" },
     education: { "without formal education": "1", "elementary": "2", "elementary graduate": "3", "high school": "4", "high school graduate": "5", "vocational course": "6", "vocational course graduate": "7", "college": "8", "college graduate": "9", "post college degree": "10" },
     disability: { "none": "0", "physical": "1", "intellectual": "2", "learning": "3", "visual": "4", "mental": "5", "psychosocial": "6", "deaf/hard of hearing": "7", "speech and language impairment": "8", "cancer": "9", "rare disease": "10" },
     illness: { "none": "0", "cancer": "1", "cardio-vascular disease": "2", "paralysis": "3", "organ failure": "4" }
 };
+
+const barangaysList = [
+    "Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa",
+    "Loma", "Malaban", "Malamig", "Mampalasan", "Platero", "Poblacion", "San Antonio",
+    "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño",
+    "Santo Tomas", "Soro-Soro", "Timbao", "Tubigan", "Zapote"
+];
 
 export default function CombinedAddProfilePage() {
   const router = useRouter();
@@ -155,6 +163,12 @@ export default function CombinedAddProfilePage() {
       </div>
 
       <div className="container">
+        <datalist id="barangay-options">
+            {barangaysList.map((bg, idx) => (
+                <option key={idx} value={bg} />
+            ))}
+        </datalist>
+
         <form onSubmit={handleSubmit}>
 
             {/* ========================================================= */}
@@ -205,7 +219,7 @@ export default function CombinedAddProfilePage() {
                     </div>
                     <div className="form-row">
                         <label>Address:</label>
-                        <input type="text" className="line-input" id="address" value={val("address")} onChange={handleChange} />
+                        <input type="text" className="line-input" id="address" list="barangay-options" value={val("address")} onChange={handleChange} placeholder="Select or type Barangay" />
                     </div>
                 </div>
 

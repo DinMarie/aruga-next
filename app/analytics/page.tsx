@@ -63,11 +63,25 @@ export default function SummaryDashboard() {
           const knownBarangays = ["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mampalasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-Soro", "Timbao", "Tubigan", "Zapote"];
           
           const normalizedAddress = rawAddress.toLowerCase().replace(/ñ/g, 'n');
+          
+          const strippedAddress = normalizedAddress
+            .replace(/binan city/g, "")
+            .replace(/city of binan/g, "")
+            .replace(/binan, laguna/g, "");
+
           for (let b of knownBarangays) {
               const normalizedB = b.toLowerCase().replace(/ñ/g, 'n');
-              if (normalizedAddress.includes(normalizedB)) {
-                  place = b;
-                  break;
+              
+              if (normalizedB === "binan") {
+                  if (strippedAddress.includes("binan")) {
+                      place = b;
+                      break;
+                  }
+              } else {
+                  if (normalizedAddress.includes(normalizedB)) {
+                      place = b;
+                      break;
+                  }
               }
           }
 
@@ -110,7 +124,6 @@ export default function SummaryDashboard() {
 
     const places = [...new Set(filteredRecords.map(r => r.place))].sort((a: any, b: any) => a.localeCompare(b));
     
-    // Executive Summary
     const paras: string[] = [];
     const totalPop = filteredRecords.length;
     
@@ -170,7 +183,11 @@ export default function SummaryDashboard() {
       }
     }
 
-    const chunkedParas: string[][] = [paras];
+    // ✅ FIXED: Safely chunk paragraphs to 3 sections per page to prevent cutoff
+    const chunkedParas: string[][] = [];
+    for (let i = 0; i < paras.length; i += 3) {
+      chunkedParas.push(paras.slice(i, i + 3));
+    }
 
     const sexes = [...new Set(filteredRecords.map(r => r.sex))].sort();
     const dTypes = [...new Set(filteredRecords.map(r => r.disabilities))].sort();
@@ -381,7 +398,7 @@ export default function SummaryDashboard() {
         .user-dropdown a { display: block; padding: 8px; text-decoration: none; color: #333; }
         .user-dropdown a:hover { background-color: #f1f1f1; }
 
-        /* --- Action Bar --- */
+        /* --- Action Bar (FIXED TO TOP) --- */
         .action-bar { padding: 25px; display: flex; gap: 12px; align-items: center; position: fixed; top: 80px; left: 0; width: 100%; height: 70px; background: white; border-bottom: 1px solid #ddd; z-index: 999; box-shadow: 0 4px 6px -2px rgba(0,0,0,0.05); }
         .btn { padding: 10px 25px; border: none; border-radius: 20px; font-weight: bold; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center;}
         .btn-paper { background-color: #512da8; }
@@ -408,12 +425,12 @@ export default function SummaryDashboard() {
         th, td { border-right: 2px solid #000; border-bottom: 2px solid #000; padding: 8px; text-align: center; font-size: 12px; }
         th { background-color: #f2f2f2; font-weight: bold; text-align: center; }
 
-        /* --- Bottom Navi --- */
+        /* --- Bottom Navi (Fixed to Bottom) --- */
         .bottom_navi { width: 100%; height: 60px; left: 0; background-color: #a68cb0; position: fixed; padding: 0 100px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; bottom: 0px; }
         .zoom { display: flex; align-items: center; gap: 5px; }
         .zoom p { font-size: 15px; font-weight: bold; color: white; margin: 0; }
 
-        /* --- Filter Sidebar --- */
+        /* --- Filter Sidebar (LOCKED TO SCREEN) --- */
         .filter-sidebar-wrapper { position: fixed; top: 150px; right: 0; bottom: 60px; width: 360px; z-index: 998; pointer-events: none; padding: 20px; display: flex; flex-direction: column; }
         
         .filter-group-container { pointer-events: auto; background: white; border: 1px solid #ccc; box-shadow: -4px 4px 15px rgba(0, 0, 0, 0.15); border-radius: 8px; display: flex; flex-direction: column; width: 100%; height: 100%; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(0); }
@@ -511,8 +528,18 @@ export default function SummaryDashboard() {
                     fontWeight: 'bold'
                   }}
               >
-             
-                {layout2Pages ? 'Double Page' : 'Single Page'}
+                <img 
+                    src="/page_layout.png" 
+                    width="18" 
+                    height="22" 
+                    alt="layout icon" 
+                    style={{ filter: layout2Pages ? 'brightness(0) invert(1)' : 'none' }}
+                    onError={(e) => { 
+                        e.currentTarget.src = '/window.svg'; 
+                        e.currentTarget.style.filter = layout2Pages ? 'invert(1)' : 'none'; 
+                    }}
+                />
+                {layout2Pages ? 'Grid View' : 'Single View'}
               </button>
               
               <button 
@@ -549,7 +576,7 @@ export default function SummaryDashboard() {
             
             {!isLoading && (
               <>
-                {/* ✅ PAGE 1: PIE CHARTS (SPLIT TO PREVENT CUTOFF) */}
+                {/* PAGE 1: PIE CHARTS */}
                 <div className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
                   <h1>Disability Records Analytics (Part 1)</h1>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
@@ -564,7 +591,7 @@ export default function SummaryDashboard() {
                   </div>
                 </div>
 
-                {/* ✅ PAGE 2: BAR CHART (SPLIT TO PREVENT CUTOFF) */}
+                {/* PAGE 2: BAR CHART */}
                 <div className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
                   <h1>Disability Records Analytics (Part 2)</h1>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', flex: 1 }}>
@@ -575,10 +602,10 @@ export default function SummaryDashboard() {
                   </div>
                 </div>
 
-                {/* ✅ PAGE 3: NEW EXPANDED EXECUTIVE SUMMARY */}
+                {/* ✅ PAGE 3+: NEW EXPANDED EXECUTIVE SUMMARY (CHUNKED 3 SECTIONS PER PAGE) */}
                 {paragraphs.map((paraChunk, idx) => (
                   <div key={`para-page-${idx}`} className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
-                    <h1>Executive Summary</h1>
+                    <h1>Executive Summary {idx > 0 ? `(Part ${idx + 1})` : ''}</h1>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', marginTop: '10px', textAlign: 'left' }}>
                       {paraChunk.map((p, i) => (
                         <div key={i} style={{ 
