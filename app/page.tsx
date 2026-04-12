@@ -6,11 +6,12 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 
 const MAX_ATTEMPTS = 3;
-const LOCK_SECONDS = 500; // 50 seconds
+const LOCK_SECONDS = 500;
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLocked, setIsLocked] = useState(false);
@@ -63,10 +64,7 @@ export default function LoginPage() {
         setTimeout(() => router.push('/table'), 1000);
       })
       .catch(() => {
-
-        // Delay error message for 4 seconds
         setTimeout(() => {
-
           attempts++;
           localStorage.setItem("loginAttempts", attempts.toString());
           let remaining = MAX_ATTEMPTS - attempts;
@@ -79,13 +77,9 @@ export default function LoginPage() {
           } else {
             setError(`❌ Wrong password. Attempts remaining: ${remaining}`);
           }
-
         }, 4000);
-
       });
   };
-
-  
 
   return (
     <div className="loginWrapper">
@@ -102,32 +96,78 @@ export default function LoginPage() {
 
           <h2>Welcome Back!</h2>
 
-          {error && <div style={{ background: '#e74c3c', color: 'white', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontWeight: 'bold' }}>{error}</div>}
-          {success && <div style={{ background: '#2ecc71', color: 'white', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontWeight: 'bold' }}>{success}</div>}
+          {error && (
+            <div style={{ background: '#e74c3c', color: 'white', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontWeight: 'bold' }}>
+              {error}
+            </div>
+          )}
+          {success && (
+            <div style={{ background: '#2ecc71', color: 'white', padding: '10px', borderRadius: '6px', marginBottom: '15px', fontWeight: 'bold' }}>
+              {success}
+            </div>
+          )}
 
           <form onSubmit={handleLogin}>
-            <input 
-              type="text" 
-              placeholder="Username" 
-              required 
-              value={username}
-              onChange={(e) => setUsername(e.target.value)} 
-            />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              required 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button type="submit" disabled={isLocked}>
-              {isLocked ? `Locked (${lockTimeRemaining}s)` : 'Login'}
-            </button>
-          </form>
+
+  {/* ✅ Wrap username the same way as password so both line up */}
+  <div style={{ width: '100%', marginBottom: '15px' }}>
+    <input
+      type="text"
+      placeholder="Username"
+      required
+      value={username}
+      onChange={(e) => setUsername(e.target.value)}
+      style={{ width: '100%', marginBottom: '0', boxSizing: 'border-box' }}
+    />
+  </div>
+
+  {/* Password wrapper */}
+  <div style={{ position: 'relative', width: '100%', marginBottom: '15px' }}>
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder="Password"
+      required
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+      style={{
+        width: '100%',
+        paddingRight: '70px',
+        marginBottom: '0',
+        boxSizing: 'border-box',
+      }}
+    />
+    <button
+      type="button"
+      onClick={() => setShowPassword(!showPassword)}
+      style={{
+        position: 'absolute',
+        right: '12px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: 'auto',
+        padding: '0',
+        margin: '0',
+        background: 'none',
+        border: 'none',
+        borderRadius: '0',
+        color: '#888',
+        cursor: 'pointer',
+        fontWeight: '600',
+        fontSize: '0.85rem',
+        lineHeight: '1',
+      }}
+    >
+      {showPassword ? 'Hide' : 'Show'}
+    </button>
+  </div>
+
+  <button type="submit" disabled={isLocked} style={{ marginTop: '5px' }}>
+    {isLocked ? `Locked (${lockTimeRemaining}s)` : 'Login'}
+  </button>
+
+</form>
         </div>
       </div>
     </div>
   );
-
-  
 }

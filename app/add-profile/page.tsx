@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import Header from '../../components/Header';
 
 const codeDictionaries: Record<string, Record<string, string>> = {
     // ✅ ADDED: "inc" as a shortcut for Iglesia ni Cristo
@@ -31,13 +32,33 @@ export default function CombinedAddProfilePage() {
   const [formData, setFormData] = useState<any>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // ✅ ADDED: State to track missing fields error
+  const [step1Error, setStep1Error] = useState("");
 
   const val = (key: string) => formData[key] || "";
 
+  // ✅ FIXED: Added validation check before advancing to step 2
   const nextStep = () => {
+    const requiredFields = [
+      "dateInterview", "timeStart", "timeEnd",
+      "interviewer_name", "household_id", "region", "pantawid_member", "province", "respondent_name", "address",
+      "r1_name", "r2_address", "r3_contact", "r4_dob", "r5_religion", "r6_ip", "r7_sex", "r8_educational_attainment", "r9_disability", "r10_illness",
+      
+    ];
+
+    const isMissingData = requiredFields.some(field => !formData[field] || String(formData[field]).trim() === "");
+
+    if (isMissingData) {
+      setStep1Error("Please fill out all the fields above before proceeding.");
+      return;
+    }
+
+    setStep1Error(""); // Clear error if validation passes
     setCurrentStep((prev) => prev + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
   const prevStep = () => {
     setCurrentStep((prev) => prev - 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -141,7 +162,7 @@ export default function CombinedAddProfilePage() {
     <div className="addWrapper">
       <div className="header">
         <div className="header-left">
-          <img src="/cswd.png" alt="CSWD Logo" />
+          <div className="logo-box"><img src="/cswd.png" alt="Logo" /></div>
           <h2>CSWDO - Binan City</h2>
         </div>
 
@@ -219,7 +240,7 @@ export default function CombinedAddProfilePage() {
                     </div>
                     <div className="form-row">
                         <label>Address:</label>
-                        <input type="text" className="line-input" id="address" list="barangay-options" value={val("address")} onChange={handleChange} placeholder="Select or type Barangay" />
+                        <input type="text" className="line-input" id="address"  value={val("address")} onChange={handleChange}  />
                     </div>
                 </div>
 
@@ -344,6 +365,13 @@ export default function CombinedAddProfilePage() {
                     </tbody>
                 </table>
 
+                {/* ✅ ADDED: Error text container displays if step 1 validation fails */}
+                {step1Error && (
+                    <div style={{ color: '#d32f2f', textAlign: 'right', marginTop: '10px', fontSize: '14px', fontWeight: 'bold' }}>
+                        ⚠ {step1Error}
+                    </div>
+                )}
+                
                 <div className="next-container">
                     <button type="button" className="next-btn" onClick={nextStep}>NEXT</button>
                 </div>

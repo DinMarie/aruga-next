@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../../lib/firebase';
 import { useReactToPrint } from 'react-to-print';
+import Header from '../../components/Header';
 
 // 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
