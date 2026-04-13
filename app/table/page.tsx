@@ -1,20 +1,96 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { collection, getDocs } from "firebase/firestore";
-import { db } from '../../lib/firebase';
-import { useReactToPrint } from 'react-to-print';
-import Header from '../../components/Header';
+import { db } from "../../lib/firebase";
+import { useReactToPrint } from "react-to-print";
+import Header from "../../components/Header";
 
 // 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
-  barangay: ["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mamplasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-soro", "Timbao", "Tubigan", "Zapote"],
+  barangay: [
+    "Biñan",
+    "Bungahan",
+    "Canlalay",
+    "Casile",
+    "De La Paz",
+    "Ganado",
+    "Langkiwa",
+    "Loma",
+    "Malaban",
+    "Malamig",
+    "Mamplasan",
+    "Platero",
+    "Poblacion",
+    "San Antonio",
+    "San Francisco",
+    "San Jose",
+    "San Vicente",
+    "Santo Domingo",
+    "Santo Niño",
+    "Santo Tomas",
+    "Soro-soro",
+    "Timbao",
+    "Tubigan",
+    "Zapote",
+  ],
   gender: ["Female", "Male"],
-  religion: ["None", "Aglipay", "Roman Catholic", "Seventh Day Adventist", "Islam", "Bible Baptist Church", "Iglesia ni Cristo", "Jehovah's Witness", "United Methodists Church", "Tribal Religions"],
-  ip: ["Non-IP", "Aeta", "Ati", "Badjao", "Bago", "Batak", "Bukidnon", "B'laan", "Cimaron", "Cayonen", "Dumagat", "Ibaloi", "Ibanag", "Itom", "Kankanaey", "Mandaya", "Mangyan", "Manobo", "Palawano", "Pullon", "Subanen"],
-  disability: ["None", "Physical", "Intellectual", "Learning", "Visual", "Mental", "Psychosocial", "Deaf/Hard of Hearing", "Speech and Language Impairment", "Cancer", "Rare Disease"],
-  illness: ["None", "Cancer", "Cardio-vascular Disease", "Paralysis", "Organ Failure"]
+  religion: [
+    "None",
+    "Aglipay",
+    "Roman Catholic",
+    "Seventh Day Adventist",
+    "Islam",
+    "Bible Baptist Church",
+    "Iglesia ni Cristo",
+    "Jehovah's Witness",
+    "United Methodists Church",
+    "Tribal Religions",
+  ],
+  ip: [
+    "Non-IP",
+    "Aeta",
+    "Ati",
+    "Badjao",
+    "Bago",
+    "Batak",
+    "Bukidnon",
+    "B'laan",
+    "Cimaron",
+    "Cayonen",
+    "Dumagat",
+    "Ibaloi",
+    "Ibanag",
+    "Itom",
+    "Kankanaey",
+    "Mandaya",
+    "Mangyan",
+    "Manobo",
+    "Palawano",
+    "Pullon",
+    "Subanen",
+  ],
+  disability: [
+    "None",
+    "Physical",
+    "Intellectual",
+    "Learning",
+    "Visual",
+    "Mental",
+    "Psychosocial",
+    "Deaf/Hard of Hearing",
+    "Speech and Language Impairment",
+    "Cancer",
+    "Rare Disease",
+  ],
+  illness: [
+    "None",
+    "Cancer",
+    "Cardio-vascular Disease",
+    "Paralysis",
+    "Organ Failure",
+  ],
 };
 
 const ALIAS_MAP: Record<string, string[]> = {
@@ -23,7 +99,7 @@ const ALIAS_MAP: Record<string, string[]> = {
   "Deaf/Hard of Hearing": ["HOH", "Deaf"],
   "Speech and Language Impairment": ["SLI"],
   "United Methodists Church": ["UMC"],
-  "Non-IP": ["Non IP", "Non-Ip", "Non Indigenous","N/A", "None"],
+  "Non-IP": ["Non IP", "Non-Ip", "Non Indigenous", "N/A", "None"],
 };
 
 interface ProfileData {
@@ -43,124 +119,191 @@ export default function TablePage() {
   const router = useRouter();
   const [profiles, setProfiles] = useState<ProfileData[]>([]);
   const [isSideMenuCollapsed, setIsSideMenuCollapsed] = useState(true);
-  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({});
+  const [openCategories, setOpenCategories] = useState<Record<string, boolean>>(
+    {},
+  );
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [notification, setNotification] = useState<{ message: string, type: 'success' | 'error' | 'loading' } | null>(null);
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: "success" | "error" | "loading";
+  } | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({
-    barangay: [], gender: [], religion: [], ip: [], disability: [], illness: []
+  const [selectedFilters, setSelectedFilters] = useState<
+    Record<string, string[]>
+  >({
+    barangay: [],
+    gender: [],
+    religion: [],
+    ip: [],
+    disability: [],
+    illness: [],
   });
-  const [otherInputs, setOtherInputs] = useState({ religion: "", ip: "", illness: "" });
+  const [otherInputs, setOtherInputs] = useState({
+    religion: "",
+    ip: "",
+    illness: "",
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 13;
-  
+
   // Ref for the printable component
   const componentRef = useRef<HTMLDivElement>(null);
 
   const performPrint = useReactToPrint({
-    contentRef: componentRef, 
-    documentTitle: 'Aruga_Summary_Report',
-    onBeforePrint: () => new Promise<void>((resolve) => {
-      setNotification({ message: "⏳ Preparing report, please wait...", type: 'loading' });
-      setTimeout(() => resolve(), 1000);
-    }),
+    contentRef: componentRef,
+    documentTitle: "Aruga_Summary_Report",
+    onBeforePrint: () =>
+      new Promise<void>((resolve) => {
+        setNotification({
+          message: "⏳ Preparing report, please wait...",
+          type: "loading",
+        });
+        setTimeout(() => resolve(), 1000);
+      }),
     onAfterPrint: () => {
-      setNotification({ message: "✅ Report generated successfully!", type: 'success' });
+      setNotification({
+        message: "✅ Report generated successfully!",
+        type: "success",
+      });
       setTimeout(() => setNotification(null), 4000);
     },
     onPrintError: () => {
-      setNotification({ message: "❌ Failed to generate report.", type: 'error' });
+      setNotification({
+        message: "❌ Failed to generate report.",
+        type: "error",
+      });
       setTimeout(() => setNotification(null), 4000);
-    }
+    },
   });
 
   useEffect(() => {
     async function fetchData() {
       try {
         const querySnapshot = await getDocs(collection(db, "profiles"));
-        const dataList = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ProfileData[];
+        const dataList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as ProfileData[];
         setProfiles(dataList);
-      } catch (error) { console.error("Error fetching data:", error); }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     }
     fetchData();
   }, []);
 
-  useEffect(() => { setCurrentPage(1); }, [searchTerm, selectedFilters]);
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedFilters]);
 
-  const toggleCategory = (cat: string) => setOpenCategories(prev => ({ ...prev, [cat]: !prev[cat] }));
+  const toggleCategory = (cat: string) =>
+    setOpenCategories((prev) => ({ ...prev, [cat]: !prev[cat] }));
 
   const handleFilterChange = (category: string, value: string) => {
-    setSelectedFilters(prev => {
+    setSelectedFilters((prev) => {
       const currentList = prev[category] || [];
       if (currentList.includes(value)) {
-        return { ...prev, [category]: currentList.filter(item => item !== value) };
+        return {
+          ...prev,
+          [category]: currentList.filter((item) => item !== value),
+        };
       }
       return { ...prev, [category]: [...currentList, value] };
     });
   };
 
-  const handleAddOther = (category: 'religion' | 'ip' | 'illness') => {
+  const handleAddOther = (category: "religion" | "ip" | "illness") => {
     const val = otherInputs[category].trim();
     if (!val) return;
-    if (!FILTER_OPTIONS[category].includes(val)) { FILTER_OPTIONS[category].push(val); }
+    if (!FILTER_OPTIONS[category].includes(val)) {
+      FILTER_OPTIONS[category].push(val);
+    }
     handleFilterChange(category, val);
-    setOtherInputs(prev => ({ ...prev, [category]: "" }));
+    setOtherInputs((prev) => ({ ...prev, [category]: "" }));
   };
 
   const clearAllFilters = () => {
-    setSelectedFilters({ barangay: [], gender: [], religion: [], ip: [], disability: [], illness: [] });
+    setSelectedFilters({
+      barangay: [],
+      gender: [],
+      religion: [],
+      ip: [],
+      disability: [],
+      illness: [],
+    });
     setOtherInputs({ religion: "", ip: "", illness: "" });
   };
 
   // ✅ FIXED: Advanced filtering with ñ normalization
-  const displayedProfiles = profiles.filter(profile => {
+  const displayedProfiles = profiles.filter((profile) => {
     // Normalization helper: lowercase and convert all "ñ" to "n"
-    const normalize = (str: string) => str.toLowerCase().replace(/ñ/g, 'n');
+    const normalize = (str: string) => str.toLowerCase().replace(/ñ/g, "n");
 
     let matchSearch = true;
     if (searchTerm) {
       const term = normalize(searchTerm);
-      matchSearch = !!(normalize(profile.name || "").includes(term) || normalize(profile.address || "").includes(term));
+      matchSearch = !!(
+        normalize(profile.name || "").includes(term) ||
+        normalize(profile.address || "").includes(term)
+      );
     }
 
     const isMatch = (selectedList: string[], dbValue: string = "") => {
       if (selectedList.length === 0) return true;
       const cleanDbValue = normalize(dbValue);
-      return selectedList.some(filterItem => {
+      return selectedList.some((filterItem) => {
         if (normalize(filterItem) === cleanDbValue) return true;
         const aliases = ALIAS_MAP[filterItem] || [];
-        return aliases.some(alias => normalize(alias) === cleanDbValue);
+        return aliases.some((alias) => normalize(alias) === cleanDbValue);
       });
     };
 
-    const matchBarangay = selectedFilters.barangay.length === 0 || selectedFilters.barangay.some(b => {
-      const address = normalize(profile.address || "");
-      const target = normalize(b); // "biñan" becomes "binan", "santo niño" becomes "santo nino"
+    const matchBarangay =
+      selectedFilters.barangay.length === 0 ||
+      selectedFilters.barangay.some((b) => {
+        const address = normalize(profile.address || "");
+        const target = normalize(b); // "biñan" becomes "binan", "santo niño" becomes "santo nino"
 
-      // Special logic to prevent Biñan City from falsely triggering Barangay Biñan
-      if (target === "binan") {
-        const strippedAddress = address
-          .replace(/binan city/g, "")
-          .replace(/binan, laguna/g, "")
-          .replace(/binan laguna/g, "");
-          
-        return strippedAddress.includes("binan");
-      }
+        // Special logic to prevent Biñan City from falsely triggering Barangay Biñan
+        if (target === "binan") {
+          const strippedAddress = address
+            .replace(/binan city/g, "")
+            .replace(/binan, laguna/g, "")
+            .replace(/binan laguna/g, "");
 
-      return address.includes(target);
-    });
+          return strippedAddress.includes("binan");
+        }
 
-    return matchSearch && matchBarangay && isMatch(selectedFilters.gender, profile.sex) && isMatch(selectedFilters.religion, profile.religion) && isMatch(selectedFilters.ip, profile.ip) && isMatch(selectedFilters.disability, profile.disability) && isMatch(selectedFilters.illness, profile.illness);
+        return address.includes(target);
+      });
+
+    return (
+      matchSearch &&
+      matchBarangay &&
+      isMatch(selectedFilters.gender, profile.sex) &&
+      isMatch(selectedFilters.religion, profile.religion) &&
+      isMatch(selectedFilters.ip, profile.ip) &&
+      isMatch(selectedFilters.disability, profile.disability) &&
+      isMatch(selectedFilters.illness, profile.illness)
+    );
   });
 
-  const totalPages = Math.max(1, Math.ceil(displayedProfiles.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(displayedProfiles.length / ITEMS_PER_PAGE),
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedProfiles = displayedProfiles.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedProfiles = displayedProfiles.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
 
   return (
     <div className="tablePageRoot">
-      <style dangerouslySetInnerHTML={{__html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         html, body { margin: 0; padding: 0; height: 100%; overflow: hidden; }
         .tablePageRoot { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; background-color: #ffffff; display: flex; height: 100%; overflow: hidden; }
         .tablePageRoot * { box-sizing: border-box; }
@@ -229,10 +372,35 @@ export default function TablePage() {
                 background-color: white !important;
             }
         }
-      `}} />
+      `,
+        }}
+      />
 
       {notification && (
-        <div style={{ position: 'fixed', top: '100px', left: '50%', transform: 'translateX(-50%)', backgroundColor: notification.type === 'loading' ? '#2196F3' : notification.type === 'success' ? '#4CAF50' : '#f44336', color: 'white', padding: '15px 30px', borderRadius: '8px', boxShadow: '0 4px 15px rgba(0,0,0,0.3)', zIndex: 999999, fontWeight: 'bold', fontSize: '16px', display: 'flex', alignItems: 'center', transition: 'all 0.3s ease' }}>
+        <div
+          style={{
+            position: "fixed",
+            top: "100px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            backgroundColor:
+              notification.type === "loading"
+                ? "#2196F3"
+                : notification.type === "success"
+                  ? "#4CAF50"
+                  : "#f44336",
+            color: "white",
+            padding: "15px 30px",
+            borderRadius: "8px",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+            zIndex: 999999,
+            fontWeight: "bold",
+            fontSize: "16px",
+            display: "flex",
+            alignItems: "center",
+            transition: "all 0.3s ease",
+          }}
+        >
           {notification.message}
         </div>
       )}
@@ -240,52 +408,125 @@ export default function TablePage() {
       <div className="page-container">
         <header className="header">
           <div className="header-left">
-            <div className="logo-box"><img src="/cswd.png" alt="Logo" /></div>
-            <span className="header-title"><b>CSWDO - Biñan City</b></span>
+            <div className="logo-box">
+              <img src="/cswd.png" alt="Logo" />
+            </div>
+            <span className="header-title">
+              <b>CSWDO - Biñan City</b>
+            </span>
           </div>
           <div className="dropdown">
-            <button className="btn" style={{color:'#333', background:'none', fontSize: '15px', fontWeight: 'bold'}} onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}>Username &#9662;</button>
-            <div className={`dropdown-content ${isUserMenuOpen ? 'show' : ''}`}>
-              <a href="#">Profile</a>
-              <a href="#" onClick={(e) => { e.preventDefault(); setShowLogoutModal(true); }} style={{color:'red', borderTop: '1px solid #eee'}}>Logout</a>
+            <button
+              className="btn"
+              style={{
+                color: "#333",
+                background: "none",
+                fontSize: "15px",
+                fontWeight: "bold",
+              }}
+              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+            >
+              Username &#9662;
+            </button>
+            <div className={`dropdown-content ${isUserMenuOpen ? "show" : ""}`}>
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowLogoutModal(true);
+                }}
+                style={{ color: "red", borderTop: "1px solid #eee" }}
+              >
+                Logout
+              </a>
             </div>
           </div>
         </header>
 
         {showLogoutModal && (
-          <div className="modal-overlay" onClick={() => setShowLogoutModal(false)}>
-            <div className="modal-box" onClick={e => e.stopPropagation()}>
-              <p style={{fontSize: '1.3rem', fontWeight: 600, color: '#333'}}>Are you sure you want to logout?</p>
+          <div
+            className="modal-overlay"
+            onClick={() => setShowLogoutModal(false)}
+          >
+            <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+              <p style={{ fontSize: "1.3rem", fontWeight: 600, color: "#333" }}>
+                Are you sure you want to logout?
+              </p>
               <div className="modal-buttons">
-                <button className="modal-btn yes" onClick={() => router.push('/login')}>YES</button>
-                <button className="modal-btn no" onClick={() => setShowLogoutModal(false)}>NO</button>
+                <button
+                  className="modal-btn yes"
+                  onClick={() => router.push("/")}
+                >
+                  YES
+                </button>
+                <button
+                  className="modal-btn no"
+                  onClick={() => setShowLogoutModal(false)}
+                >
+                  NO
+                </button>
               </div>
             </div>
           </div>
         )}
 
         <div className="main-layout">
-          <div className={`side-menu ${isSideMenuCollapsed ? 'collapsed' : ''}`}>
-            <div className="side-menu-header"><h3>FILTERS</h3></div>
+          <div
+            className={`side-menu ${isSideMenuCollapsed ? "collapsed" : ""}`}
+          >
+            <div className="side-menu-header">
+              <h3>FILTERS</h3>
+            </div>
             <div className="side-menu-content">
-              {Object.keys(FILTER_OPTIONS).map(catKey => (
+              {Object.keys(FILTER_OPTIONS).map((catKey) => (
                 <div className="filter-category" key={catKey}>
-                  <div className="category-header" onClick={() => toggleCategory(catKey)}>
-                    <span style={{textTransform: 'capitalize'}}>{catKey}</span>
-                    <span className="category-indicator">{openCategories[catKey] ? '▲' : '▼'}</span>
+                  <div
+                    className="category-header"
+                    onClick={() => toggleCategory(catKey)}
+                  >
+                    <span style={{ textTransform: "capitalize" }}>
+                      {catKey}
+                    </span>
+                    <span className="category-indicator">
+                      {openCategories[catKey] ? "▲" : "▼"}
+                    </span>
                   </div>
                   {openCategories[catKey] && (
                     <div className="category-checklist">
-                      {FILTER_OPTIONS[catKey as keyof typeof FILTER_OPTIONS].map(item => (
+                      {FILTER_OPTIONS[
+                        catKey as keyof typeof FILTER_OPTIONS
+                      ].map((item) => (
                         <div className="checkbox-item" key={item}>
-                          <input type="checkbox" id={`${catKey}-${item}`} checked={selectedFilters[catKey].includes(item)} onChange={() => handleFilterChange(catKey, item)} />
+                          <input
+                            type="checkbox"
+                            id={`${catKey}-${item}`}
+                            checked={selectedFilters[catKey].includes(item)}
+                            onChange={() => handleFilterChange(catKey, item)}
+                          />
                           <label htmlFor={`${catKey}-${item}`}>{item}</label>
                         </div>
                       ))}
-                      {['religion', 'ip', 'illness'].includes(catKey) && (
+                      {["religion", "ip", "illness"].includes(catKey) && (
                         <div className="others-row">
-                          <input type="text" placeholder="others:" value={otherInputs[catKey as keyof typeof otherInputs]} onChange={e => setOtherInputs({...otherInputs, [catKey]: e.target.value})} />
-                          <button className="btn-add-others" onClick={() => handleAddOther(catKey as any)}>➕</button>
+                          <input
+                            type="text"
+                            placeholder="others:"
+                            value={
+                              otherInputs[catKey as keyof typeof otherInputs]
+                            }
+                            onChange={(e) =>
+                              setOtherInputs({
+                                ...otherInputs,
+                                [catKey]: e.target.value,
+                              })
+                            }
+                          />
+                          <button
+                            className="btn-add-others"
+                            onClick={() => handleAddOther(catKey as any)}
+                          >
+                            ➕
+                          </button>
                         </div>
                       )}
                     </div>
@@ -293,54 +534,117 @@ export default function TablePage() {
                 </div>
               ))}
               <div className="filter-footer">
-                <button className="btn-clear-all" onClick={clearAllFilters}>Clear All</button>
-                <button className="btn-apply" onClick={() => setIsSideMenuCollapsed(true)}>Apply</button>
+                <button className="btn-clear-all" onClick={clearAllFilters}>
+                  Clear All
+                </button>
+                <button
+                  className="btn-apply"
+                  onClick={() => setIsSideMenuCollapsed(true)}
+                >
+                  Apply
+                </button>
               </div>
             </div>
           </div>
 
           <div className="main-content">
             <div className="action-bar">
-              <button className="btn-filter" onClick={() => setIsSideMenuCollapsed(!isSideMenuCollapsed)}>
-                {isSideMenuCollapsed ? '☰ FILTER' : '◀ FILTER'}
+              <button
+                className="btn-filter"
+                onClick={() => setIsSideMenuCollapsed(!isSideMenuCollapsed)}
+              >
+                {isSideMenuCollapsed ? "☰ FILTER" : "◀ FILTER"}
               </button>
               <div className="search-wrapper">
-                <input type="text" className="search-input" placeholder="*FirstName / *LastName / *Barangay" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-                {searchTerm && <div className="clear-search" style={{display: 'flex'}} onClick={() => setSearchTerm("")}>✕</div>}
+                <input
+                  type="text"
+                  className="search-input"
+                  placeholder="*FirstName / *LastName / *Barangay"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                {searchTerm && (
+                  <div
+                    className="clear-search"
+                    style={{ display: "flex" }}
+                    onClick={() => setSearchTerm("")}
+                  >
+                    ✕
+                  </div>
+                )}
               </div>
               <button className="btn btn-search">Search</button>
-              <button className="btn btn-add" onClick={() => router.push('/add-profile')}>Add</button>
-              <button className="btn btn-summary" onClick={() => router.push('/analytics')}>Summary</button>
+              <button
+                className="btn btn-add"
+                onClick={() => router.push("/add-profile")}
+              >
+                Add
+              </button>
+              <button
+                className="btn btn-summary"
+                onClick={() => router.push("/analytics")}
+              >
+                Summary
+              </button>
             </div>
 
             <div className="table-area">
               <div className="table-title">
-                Summary of Informations (Showing {displayedProfiles.length === 0 ? 0 : startIndex + 1}–{Math.min(startIndex + ITEMS_PER_PAGE, displayedProfiles.length)} of {displayedProfiles.length})
+                Summary of Informations (Showing{" "}
+                {displayedProfiles.length === 0 ? 0 : startIndex + 1}–
+                {Math.min(
+                  startIndex + ITEMS_PER_PAGE,
+                  displayedProfiles.length,
+                )}{" "}
+                of {displayedProfiles.length})
               </div>
               <table>
                 <thead>
                   <tr>
-                    <th>Name</th><th>Birthday</th><th>Sex</th><th>Contact</th>
-                    <th>Address</th><th>Religion</th><th>IP</th><th>Disability</th>
-                    <th>Illness</th><th>Action</th>
+                    <th>Name</th>
+                    <th>Birthday</th>
+                    <th>Sex</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Religion</th>
+                    <th>IP</th>
+                    <th>Disability</th>
+                    <th>Illness</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {paginatedProfiles.length === 0 ? (
-                    <tr><td colSpan={10} style={{ textAlign: 'center', padding: '20px' }}>No records found.</td></tr>
+                    <tr>
+                      <td
+                        colSpan={10}
+                        style={{ textAlign: "center", padding: "20px" }}
+                      >
+                        No records found.
+                      </td>
+                    </tr>
                   ) : (
                     paginatedProfiles.map((profile) => (
                       <tr key={profile.id}>
-                        <td>{profile.name || 'N/A'}</td>
-                        <td>{profile.birthday || 'N/A'}</td>
-                        <td>{profile.sex || 'N/A'}</td>
-                        <td>{profile.contact || 'N/A'}</td>
-                        <td>{profile.address || 'N/A'}</td>
-                        <td>{profile.religion || 'N/A'}</td>
-                        <td>{profile.ip || 'N/A'}</td>
-                        <td>{profile.disability || 'N/A'}</td>
-                        <td>{profile.illness || 'N/A'}</td>
-                        <td><button className="check-btn" onClick={() => router.push(`/fulldetails?id=${profile.id}`)}>Check Information</button></td>
+                        <td>{profile.name || "N/A"}</td>
+                        <td>{profile.birthday || "N/A"}</td>
+                        <td>{profile.sex || "N/A"}</td>
+                        <td>{profile.contact || "N/A"}</td>
+                        <td>{profile.address || "N/A"}</td>
+                        <td>{profile.religion || "N/A"}</td>
+                        <td>{profile.ip || "N/A"}</td>
+                        <td>{profile.disability || "N/A"}</td>
+                        <td>{profile.illness || "N/A"}</td>
+                        <td>
+                          <button
+                            className="check-btn"
+                            onClick={() =>
+                              router.push(`/fulldetails?id=${profile.id}`)
+                            }
+                          >
+                            Check Information
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -349,97 +653,231 @@ export default function TablePage() {
             </div>
 
             <footer className="footer-controls">
-              <button className="btn-print" onClick={() => performPrint && performPrint()}>PRINT REPORT</button>
+              <button
+                className="btn-print"
+                onClick={() => performPrint && performPrint()}
+              >
+                PRINT REPORT
+              </button>
               <div className="pagination">
                 <button
                   suppressHydrationWarning
                   className="pg-btn"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
+                  }
                   disabled={currentPage === 1 || undefined}
-                >&lt;</button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
-                  <button
-                    key={pageNum}
-                    className={`pg-btn ${currentPage === pageNum ? 'active' : ''}`}
-                    onClick={() => setCurrentPage(pageNum)}
-                  >{pageNum}</button>
-                ))}
+                >
+                  &lt;
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNum) => (
+                    <button
+                      key={pageNum}
+                      className={`pg-btn ${currentPage === pageNum ? "active" : ""}`}
+                      onClick={() => setCurrentPage(pageNum)}
+                    >
+                      {pageNum}
+                    </button>
+                  ),
+                )}
                 <button
                   suppressHydrationWarning
                   className="pg-btn"
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+                  }
                   disabled={currentPage === totalPages || undefined}
-                >&gt;</button>
+                >
+                  &gt;
+                </button>
               </div>
             </footer>
           </div>
         </div>
 
-        <div style={{ display: 'none' }}>
-          <div ref={componentRef} style={{ fontFamily: 'Segoe UI, Arial, sans-serif', padding: '30px', background: 'white' }}>
-
+        <div style={{ display: "none" }}>
+          <div
+            ref={componentRef}
+            style={{
+              fontFamily: "Segoe UI, Arial, sans-serif",
+              padding: "30px",
+              background: "white",
+            }}
+          >
             {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '8px' }}>
-              <img src="/cswd.png" alt="Logo" style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "15px",
+                marginBottom: "8px",
+              }}
+            >
+              <img
+                src="/cswd.png"
+                alt="Logo"
+                style={{ width: "60px", height: "60px", objectFit: "contain" }}
+              />
               <div>
-                <h2 style={{ margin: 0, fontSize: '1.4rem', color: '#2a1b3c' }}>CSWDO - Biñan City</h2>
-                <p style={{ margin: 0, fontSize: '0.9rem', color: '#555' }}>City Social Welfare and Development Office</p>
+                <h2 style={{ margin: 0, fontSize: "1.4rem", color: "#2a1b3c" }}>
+                  CSWDO - Biñan City
+                </h2>
+                <p style={{ margin: 0, fontSize: "0.9rem", color: "#555" }}>
+                  City Social Welfare and Development Office
+                </p>
               </div>
             </div>
 
-            <hr style={{ borderColor: '#a68cb0', marginBottom: '10px' }} />
+            <hr style={{ borderColor: "#a68cb0", marginBottom: "10px" }} />
 
             {/* Report Meta */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', fontSize: '0.85rem', color: '#444' }}>
-              <span><b>Summary Report</b> — {displayedProfiles.length} record(s)</span>
-              <span>Date Generated: {new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                marginBottom: "16px",
+                fontSize: "0.85rem",
+                color: "#444",
+              }}
+            >
+              <span>
+                <b>Summary Report</b> — {displayedProfiles.length} record(s)
+              </span>
+              <span>
+                Date Generated:{" "}
+                {new Date().toLocaleDateString("en-PH", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
             </div>
 
             {/* Active Filters Summary */}
             {Object.entries(selectedFilters).some(([, v]) => v.length > 0) && (
-              <div style={{ marginBottom: '14px', fontSize: '0.8rem', color: '#555', background: '#f4f0fa', padding: '8px 12px', borderRadius: '6px', border: '1px solid #dcd0e8' }}>
+              <div
+                style={{
+                  marginBottom: "14px",
+                  fontSize: "0.8rem",
+                  color: "#555",
+                  background: "#f4f0fa",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  border: "1px solid #dcd0e8",
+                }}
+              >
                 <b>Active Filters: </b>
                 {Object.entries(selectedFilters)
                   .filter(([, v]) => v.length > 0)
-                  .map(([k, v]) => `${k.charAt(0).toUpperCase() + k.slice(1)}: ${v.join(', ')}`)
-                  .join(' | ')}
+                  .map(
+                    ([k, v]) =>
+                      `${k.charAt(0).toUpperCase() + k.slice(1)}: ${v.join(", ")}`,
+                  )
+                  .join(" | ")}
               </div>
             )}
 
             {/* Print Table */}
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem' }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: "0.82rem",
+              }}
+            >
               <thead>
-                <tr style={{ backgroundColor: '#a68cb0', color: 'white' }}>
-                  {['#', 'Name', 'Birthday', 'Sex', 'Contact', 'Address', 'Religion', 'IP', 'Disability', 'Illness'].map(h => (
-                    <th key={h} style={{ padding: '9px 8px', border: '1px solid #8e6e9e', textAlign: 'left', fontWeight: 600 }}>{h}</th>
+                <tr style={{ backgroundColor: "#a68cb0", color: "white" }}>
+                  {[
+                    "#",
+                    "Name",
+                    "Birthday",
+                    "Sex",
+                    "Contact",
+                    "Address",
+                    "Religion",
+                    "IP",
+                    "Disability",
+                    "Illness",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      style={{
+                        padding: "9px 8px",
+                        border: "1px solid #8e6e9e",
+                        textAlign: "left",
+                        fontWeight: 600,
+                      }}
+                    >
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {displayedProfiles.map((p, i) => (
-                  <tr key={p.id} style={{ backgroundColor: i % 2 === 0 ? '#ffffff' : '#f9f6fd' }}>
-                    <td style={{ padding: '8px', border: '1px solid #ddd', color: '#666' }}>{i + 1}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.name || 'N/A'}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.birthday || 'N/A'}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.sex || 'N/A'}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.contact || 'N/A'}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.address || 'N/A'}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.religion || 'N/A'}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.ip || 'N/A'}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.disability || 'N/A'}</td>
-                    <td style={{ padding: '8px', border: '1px solid #ddd' }}>{p.illness || 'N/A'}</td>
+                  <tr
+                    key={p.id}
+                    style={{
+                      backgroundColor: i % 2 === 0 ? "#ffffff" : "#f9f6fd",
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: "8px",
+                        border: "1px solid #ddd",
+                        color: "#666",
+                      }}
+                    >
+                      {i + 1}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.name || "N/A"}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.birthday || "N/A"}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.sex || "N/A"}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.contact || "N/A"}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.address || "N/A"}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.religion || "N/A"}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.ip || "N/A"}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.disability || "N/A"}
+                    </td>
+                    <td style={{ padding: "8px", border: "1px solid #ddd" }}>
+                      {p.illness || "N/A"}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
 
             {/* Print Footer */}
-            <div style={{ marginTop: '30px', fontSize: '0.8rem', color: '#888', textAlign: 'center', borderTop: '1px solid #ddd', paddingTop: '10px' }}>
+            <div
+              style={{
+                marginTop: "30px",
+                fontSize: "0.8rem",
+                color: "#888",
+                textAlign: "center",
+                borderTop: "1px solid #ddd",
+                paddingTop: "10px",
+              }}
+            >
               CSWDO Biñan City
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

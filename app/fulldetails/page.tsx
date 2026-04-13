@@ -176,8 +176,8 @@ function FullDetailsEditContent() {
         <div className="dropdown">
           <button className="dropbtn" type="button" onClick={toggleMenu}>Username ▼</button>
           <div id="dropdownMenu" className="dropdown-content" style={{ display: isMenuOpen ? 'block' : 'none' }}>
-            <a href="#">Profile</a>
-            <a href="#" className="logout">Logout</a>
+            
+            <a href="/" className="logout">Logout</a>
           </div>
         </div>
       </div>

@@ -747,9 +747,8 @@ export default function SummaryDashboard() {
                 className="dropdown-content user-dropdown"
                 style={{ display: userDropdownOpen ? "block" : "none" }}
               >
-                <a href="#">Profile</a>
                 <a
-                  href="#"
+                  href="/"
                   id="logoutBtn"
                   style={{ color: "red", borderTop: "1px solid #eee" }}
                 >
