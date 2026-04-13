@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useReactToPrint } from "react-to-print";
-import Header from "../../components/Header";
 
 // 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
@@ -147,7 +146,6 @@ export default function TablePage() {
   const [currentPage, setCurrentPage] = useState(1);
   const ITEMS_PER_PAGE = 13;
 
-  // Ref for the printable component
   const componentRef = useRef<HTMLDivElement>(null);
 
   const performPrint = useReactToPrint({
@@ -235,9 +233,7 @@ export default function TablePage() {
     setOtherInputs({ religion: "", ip: "", illness: "" });
   };
 
-  // ✅ FIXED: Advanced filtering with ñ normalization
   const displayedProfiles = profiles.filter((profile) => {
-    // Normalization helper: lowercase and convert all "ñ" to "n"
     const normalize = (str: string) => str.toLowerCase().replace(/ñ/g, "n");
 
     let matchSearch = true;
@@ -263,18 +259,14 @@ export default function TablePage() {
       selectedFilters.barangay.length === 0 ||
       selectedFilters.barangay.some((b) => {
         const address = normalize(profile.address || "");
-        const target = normalize(b); // "biñan" becomes "binan", "santo niño" becomes "santo nino"
-
-        // Special logic to prevent Biñan City from falsely triggering Barangay Biñan
+        const target = normalize(b);
         if (target === "binan") {
           const strippedAddress = address
             .replace(/binan city/g, "")
             .replace(/binan, laguna/g, "")
             .replace(/binan laguna/g, "");
-
           return strippedAddress.includes("binan");
         }
-
         return address.includes(target);
       });
 
@@ -312,7 +304,7 @@ export default function TablePage() {
         .tablePageRoot .header-left { display: flex; align-items: center; gap: 15px; }
         .tablePageRoot .logo-box { width: 50px; height: 50px; background-color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .tablePageRoot .logo-box img { width: 100%; height: 100%; object-fit: contain; }
-        .tablePageRoot .header-title { font-size: 1.2rem; color: #2a1b3c; }
+        .tablePageRoot .header-title { font-size: 20px; color: white; }
         .tablePageRoot .dropdown { position: relative; display: inline-block; }
         .tablePageRoot .dropdown-content { display: none; position: absolute; background-color: white; min-width: 150px; box-shadow: 0px 8px 24px rgba(0,0,0,0.2); z-index: 100; border: 1px solid #ccc; border-radius: 8px; right: 0; overflow: hidden; }
         .tablePageRoot .dropdown-content.show { display: block; }
@@ -366,11 +358,31 @@ export default function TablePage() {
         .tablePageRoot .no { background: #bbb; color: white; }
 
         @media print {
-            html, body {
-                height: auto !important;
-                overflow: visible !important;
-                background-color: white !important;
-            }
+          @page {
+            size: A4 landscape;
+            margin: 15mm;
+          }
+          html, body {
+            height: auto !important;
+            overflow: visible !important;
+            background-color: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          table {
+            page-break-inside: auto;
+            width: 100% !important;
+          }
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+          }
+          thead {
+            display: table-header-group;
+          }
+          tbody {
+            display: table-row-group;
+          }
         }
       `,
         }}
@@ -419,9 +431,9 @@ export default function TablePage() {
             <button
               className="btn"
               style={{
-                color: "#333",
+                color: "white",
                 background: "none",
-                fontSize: "15px",
+                fontSize: "18px",
                 fontWeight: "bold",
               }}
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -696,6 +708,7 @@ export default function TablePage() {
           </div>
         </div>
 
+        {/* PRINT COMPONENT - hidden on screen */}
         <div style={{ display: "none" }}>
           <div
             ref={componentRef}
@@ -705,7 +718,7 @@ export default function TablePage() {
               background: "white",
             }}
           >
-            {/* Header */}
+            {/* Print Header */}
             <div
               style={{
                 display: "flex",
@@ -787,7 +800,15 @@ export default function TablePage() {
               }}
             >
               <thead>
-                <tr style={{ backgroundColor: "#a68cb0", color: "white" }}>
+                <tr
+                  style={{
+                    backgroundColor: "#a68cb0",
+                    color: "white",
+                    WebkitPrintColorAdjust: "exact",
+                    // @ts-ignore
+                    printColorAdjust: "exact",
+                  }}
+                >
                   {[
                     "#",
                     "Name",

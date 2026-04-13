@@ -573,7 +573,7 @@ export default function SummaryDashboard() {
 
         /* --- Header --- */
         .header { position: fixed; top: 0; left: 0; width: 100%; background-color: #a68cb0; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8e6e9e; z-index: 1000; height: 80px; }
-        .header-title { color: white; font-weight: bold; }
+        .header-title { color: white; font-weight: bold; font-size: 20px; }
         .header-left { display: flex; align-items: center; gap: 15px; }
         .logo-box { width: 50px; height: 50px; background-color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .logo-box img { width: 100%; height: 100%; object-fit: contain; }
@@ -738,7 +738,11 @@ export default function SummaryDashboard() {
             >
               <button
                 className="btn"
-                style={{ color: "white", background: "none" }}
+                style={{
+                  color: "white",
+                  fontSize: "18px",
+                  background: "none",
+                }}
                 onClick={() => setUserDropdownOpen(!userDropdownOpen)}
               >
                 Username &#9662;
