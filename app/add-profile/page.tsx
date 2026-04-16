@@ -8,6 +8,11 @@ import { collection, addDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import Header from '../../components/Header';
 
+const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error" | "loading";
+} | null>(null);
+
 const codeDictionaries: Record<string, Record<string, string>> = {
     religion: { "none": "0", "roman catholic": "1","catholic":"1", "islam": "2", "iglesia ni cristo": "3", "inc": "3", "aglipay": "4", "seventh day adventist": "5", "bible baptist church": "6", "jehova's witness": "7", "united methodists church": "8", "tribal religions": "9","tribal": "9","tribal religion": "9" },
     ip: { "non-ip": "0", "aeta": "1", "ati": "2", "badjao": "3", "bago": "4", "batak": "5", "bukidnon": "6", "b'laan": "7", "cimaron": "8", "duyonen": "9", "dumagat": "10", "ibaloi": "11", "ibanag": "12", "itom": "13", "kankanaey": "14", "mandaya": "15", "mangyan": "16", "manobo": "17", "palawano": "18", "pullon": "19", "subanen": "20", "tagbanuas": "21", "tau't bato": "22", "teduray": "23", "t'boli": "24" },
@@ -215,11 +220,12 @@ export default function CombinedAddProfilePage() {
         };
 
         await addDoc(collection(db, "profiles"), finalData);
-        alert("Form Saved Successfully!");
-        router.push('/table');
+setNotification({ message: "✅ Form Saved Successfully!", type: "success" });
+setTimeout(() => router.push("/table"), 1500);
     } catch (error: any) {
         console.error("FIREBASE ERROR:", error);
-        alert("Error saving data: " + error.message);
+      setNotification({ message: "❌ Error saving data: " + error.message, type: "error" });
+setTimeout(() => setNotification(null), 4000);
     } finally {
         setIsSaving(false);
     }
@@ -263,6 +269,35 @@ export default function CombinedAddProfilePage() {
         }
         .combo-item:hover { background-color: #f4f0fa; color: #512da8; font-weight: 600; }
       `}} />
+
+      {notification && (
+  <div
+    style={{
+      position: "fixed",
+      top: "100px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      backgroundColor:
+        notification.type === "loading"
+          ? "#2196F3"
+          : notification.type === "success"
+            ? "#4CAF50"
+            : "#f44336",
+      color: "white",
+      padding: "15px 30px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+      zIndex: 999999,
+      fontWeight: "bold",
+      fontSize: "16px",
+      display: "flex",
+      alignItems: "center",
+      transition: "all 0.3s ease",
+    }}
+  >
+    {notification.message}
+  </div>
+)}
 
       <Header />
 

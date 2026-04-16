@@ -7,6 +7,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 
+const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error" | "loading";
+} | null>(null);
+
 const codeDictionaries: Record<string, Record<string, string>> = {
     religion: { "none": "0", "roman catholic": "1", "islam": "2", "iglesia ni cristo": "3", "aglipay": "4", "seventh day adventist": "5", "bible baptist church": "6", "jehova's witness": "7", "united methodists church": "8", "tribal religions": "9" },
     ip: { "non-ip": "0", "aeta": "1", "ati": "2", "badjao": "3", "bago": "4", "batak": "5", "bukidnon": "6", "b'laan": "7", "cimaron": "8", "duyonen": "9", "dumagat": "10", "ibaloi": "11", "ibanag": "12", "itom": "13", "kankanaey": "14", "mandaya": "15", "mangyan": "16", "manobo": "17", "palawano": "18", "pullon": "19", "subanen": "20", "tagbanuas": "21", "tau't bato": "22", "teduray": "23", "t'boli": "24" },
@@ -15,6 +20,21 @@ const codeDictionaries: Record<string, Record<string, string>> = {
     disability: { "none": "0", "physical": "1", "intellectual": "2", "learning": "3", "visual": "4", "mental": "5", "psychosocial": "6", "deaf/hard of hearing": "7", "speech and language impairment": "8", "cancer": "9", "rare disease": "10" },
     illness: { "none": "0", "cancer": "1", "cardio-vascular disease": "2", "paralysis": "3", "organ failure": "4" }
 };
+
+// ✅ ADDED: Formatted options for the datalists
+const barangaysList = [
+  "Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado",
+  "Langkiwa", "Loma", "Malaban", "Malamig", "Mampalasan", "Platero",
+  "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente",
+  "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-Soro", "Timbao",
+  "Tubigan", "Zapote",
+];
+const religionOptions = ["None", "Roman Catholic", "Islam", "Iglesia ni Cristo", "Aglipay", "Seventh Day Adventist", "Bible Baptist Church", "Jehova's Witness", "United Methodists Church", "Tribal Religions"];
+const ipOptions = ["Non-IP", "Aeta", "Ati", "Badjao", "Bago", "Batak", "Bukidnon", "B'laan", "Cimaron", "Duyonen", "Dumagat", "Ibaloi", "Ibanag", "Itom", "Kankanaey", "Mandaya", "Mangyan", "Manobo", "Palawano", "Pullon", "Subanen", "Tagbanuas", "Tau't Bato", "Teduray", "T'boli"];
+const sexOptions = ["Male", "Female"];
+const educationOptions = ["Without Formal Education", "Elementary", "Elementary Graduate", "High School", "High School Graduate", "Vocational Course", "Vocational Course Graduate", "College", "College Graduate", "Post College Degree"];
+const disabilityOptions = ["None", "Physical", "Intellectual", "Learning", "Visual", "Mental", "Psychosocial", "Deaf/Hard of Hearing", "Speech and Language Impairment", "Cancer", "Rare Disease"];
+const illnessOptions = ["None", "Cancer", "Cardio-vascular disease", "Paralysis", "Organ Failure"];
 
 function FullDetailsEditContent() {
   const router = useRouter();
@@ -30,8 +50,8 @@ function FullDetailsEditContent() {
 
   useEffect(() => {
     if (!docId) {
-      alert("No Profile ID found.");
-      router.push('/table');
+    setNotification({ message: "❌ No Profile ID found.", type: "error" });
+setTimeout(() => router.push('/table'), 1500);
       return;
     }
     const fetchProfile = async () => {
@@ -141,11 +161,12 @@ function FullDetailsEditContent() {
             disability: formData.r9_disability || "", illness: formData.r10_illness || "", family_size: formData.h1_family_size || "",
         };
         await updateDoc(doc(db, "profiles", docId as string), finalData);
-        alert("Record Updated Successfully!");
-        router.push('/table');
+  setNotification({ message: "✅ Record Updated Successfully!", type: "success" });
+setTimeout(() => router.push('/table'), 1500);
     } catch (error: any) {
         console.error("FIREBASE ERROR:", error);
-        alert("Error updating record: " + error.message);
+     setNotification({ message: "❌ Error updating record: " + error.message, type: "error" });
+setTimeout(() => setNotification(null), 4000);
     } finally {
         setIsSaving(false);
     }
@@ -155,10 +176,11 @@ function FullDetailsEditContent() {
   const handleDelete = async () => {
     try {
         await deleteDoc(doc(db, "profiles", docId as string));
-        alert("Record Deleted Successfully!");
-        router.push('/table');
+setNotification({ message: "✅ Record Deleted Successfully!", type: "success" });
+setTimeout(() => router.push('/table'), 1500);
     } catch (error: any) {
-        alert("Error deleting record: " + error.message);
+    setNotification({ message: "❌ Error deleting record: " + error.message, type: "error" });
+setTimeout(() => setNotification(null), 4000);
     }
   };
 
@@ -191,6 +213,56 @@ function FullDetailsEditContent() {
 
       <div className="container">
         
+        {/* ✅ ADDED: Datalists for Autocomplete */}
+        <datalist id="barangay-options">
+          {barangaysList.map((bg, idx) => <option key={idx} value={bg} />)}
+        </datalist>
+        <datalist id="religion-options">
+          {religionOptions.map((opt, idx) => <option key={idx} value={opt} />)}
+        </datalist>
+        <datalist id="ip-options">
+          {ipOptions.map((opt, idx) => <option key={idx} value={opt} />)}
+        </datalist>
+        <datalist id="sex-options">
+          {sexOptions.map((opt, idx) => <option key={idx} value={opt} />)}
+        </datalist>
+        <datalist id="education-options">
+          {educationOptions.map((opt, idx) => <option key={idx} value={opt} />)}
+        </datalist>
+        <datalist id="disability-options">
+          {disabilityOptions.map((opt, idx) => <option key={idx} value={opt} />)}
+        </datalist>
+        <datalist id="illness-options">
+          {illnessOptions.map((opt, idx) => <option key={idx} value={opt} />)}
+        </datalist>
+{notification && (
+  <div
+    style={{
+      position: "fixed",
+      top: "100px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      backgroundColor:
+        notification.type === "loading"
+          ? "#2196F3"
+          : notification.type === "success"
+            ? "#4CAF50"
+            : "#f44336",
+      color: "white",
+      padding: "15px 30px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+      zIndex: 999999,
+      fontWeight: "bold",
+      fontSize: "16px",
+      display: "flex",
+      alignItems: "center",
+      transition: "all 0.3s ease",
+    }}
+  >
+    {notification.message}
+  </div>
+)}
         {/* RIGHT SIDE BUTTONS (Print, Update, Delete) */}
         <div className="container-right">
             <button type="button" className="printform-btn" onClick={() => router.push(`/print?id=${docId}`)}>Print Form</button>
@@ -248,7 +320,8 @@ function FullDetailsEditContent() {
                     </div>
                     <div className="form-row">
                         <label>Address:</label>
-                        <input type="text" className="line-input" id="address" value={val("address")} onChange={handleChange} />
+                        {/* ✅ ADDED: list="barangay-options" */}
+                        <input type="text" className="line-input" id="address" list="barangay-options" value={val("address")} onChange={handleChange} />
                     </div>
                 </div>
 
@@ -265,7 +338,8 @@ function FullDetailsEditContent() {
                         <tr>
                             <td>R2.</td>
                             <td>Address:</td>
-                            <td><input type="text" id="r2_address" value={val("r2_address")} onChange={handleChange} /></td>
+                            {/* ✅ ADDED: list="barangay-options" */}
+                            <td><input type="text" id="r2_address" list="barangay-options" value={val("r2_address")} onChange={handleChange} /></td>
                             <td></td>
                         </tr>
                         <tr>
@@ -283,37 +357,43 @@ function FullDetailsEditContent() {
                         <tr>
                             <td>R5.</td>
                             <td>Religion:</td>
-                            <td><input type="text" id="r5_religion" value={val("r5_religion")} onChange={handleChange} /></td>
+                            {/* ✅ ADDED: list="religion-options" */}
+                            <td><input type="text" id="r5_religion" list="religion-options" value={val("r5_religion")} onChange={handleChange} /></td>
                             <td className="code-col">Code: <input type="text" className="code-input" id="r5_religion_code" value={val("r5_religion_code")} readOnly /></td>
                         </tr>
                         <tr>
                             <td>R6.</td>
                             <td>IP Membership:</td>
-                            <td><input type="text" id="r6_ip" value={val("r6_ip")} onChange={handleChange} /></td>
+                            {/* ✅ ADDED: list="ip-options" */}
+                            <td><input type="text" id="r6_ip" list="ip-options" value={val("r6_ip")} onChange={handleChange} /></td>
                             <td className="code-col">Code: <input type="text" className="code-input" id="r6_ip_code" value={val("r6_ip_code")} readOnly /></td>
                         </tr>
                         <tr>
                             <td>R7.</td>
                             <td>Sex:</td>
-                            <td><input type="text" id="r7_sex" value={val("r7_sex")} onChange={handleChange} /></td>
+                            {/* ✅ ADDED: list="sex-options" */}
+                            <td><input type="text" id="r7_sex" list="sex-options" value={val("r7_sex")} onChange={handleChange} /></td>
                             <td className="code-col">Code: <input type="text" className="code-input" id="r7_sex_code" value={val("r7_sex_code")} readOnly /></td>
                         </tr>
                         <tr>
                             <td>R8.</td>
                             <td>Highest Educational Attainment:</td>
-                            <td><input type="text" id="r8_educational_attainment" value={val("r8_educational_attainment")} onChange={handleChange} /></td>
+                            {/* ✅ ADDED: list="education-options" */}
+                            <td><input type="text" id="r8_educational_attainment" list="education-options" value={val("r8_educational_attainment")} onChange={handleChange} /></td>
                             <td className="code-col">Code: <input type="text" className="code-input" id="r8_education_code" value={val("r8_education_code")} readOnly /></td>
                         </tr>
                         <tr>
                             <td>R9.</td>
                             <td>Disability / Special Needs:</td>
-                            <td><input type="text" id="r9_disability" value={val("r9_disability")} onChange={handleChange} /></td>
+                            {/* ✅ ADDED: list="disability-options" */}
+                            <td><input type="text" id="r9_disability" list="disability-options" value={val("r9_disability")} onChange={handleChange} /></td>
                             <td className="code-col">Code: <input type="text" className="code-input" id="r9_disability_code" value={val("r9_disability_code")} readOnly /></td>
                         </tr>
                         <tr>
                             <td>R10.</td>
                             <td>Critical Illness:</td>
-                            <td><input type="text" id="r10_illness" value={val("r10_illness")} onChange={handleChange} /></td>
+                            {/* ✅ ADDED: list="illness-options" */}
+                            <td><input type="text" id="r10_illness" list="illness-options" value={val("r10_illness")} onChange={handleChange} /></td>
                             <td className="code-col">Code: <input type="text" className="code-input" id="r10_illness_code" value={val("r10_illness_code")} readOnly /></td>
                         </tr>
                     </tbody>

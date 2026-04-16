@@ -9,6 +9,11 @@ import Script from "next/script";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 
+const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error" | "loading";
+} | null>(null);
+
 const paperDimensions: any = {
   a4: { width: "210mm", height: "297mm" },
   letter: { width: "216mm", height: "279mm" },
@@ -490,8 +495,11 @@ export default function SummaryDashboard() {
 
   // 5. Download PDF
   const downloadPDF = async () => {
-    if (!h2cLoaded || !jspdfLoaded)
-      return alert("PDF Libraries are still loading...");
+  if (!h2cLoaded || !jspdfLoaded) {
+  setNotification({ message: "⏳ PDF Libraries are still loading...", type: "loading" });
+  setTimeout(() => setNotification(null), 3000);
+  return;
+}
     const html2canvas = (window as any).html2canvas;
     const jsPDF = (window as any).jspdf.jsPDF;
     let pdf;
@@ -718,6 +726,34 @@ export default function SummaryDashboard() {
             transition: "padding-right 0.3s cubic-bezier(0.4,0,0.2,1)",
           }}
         >
+          {notification && (
+  <div
+    style={{
+      position: "fixed",
+      top: "100px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      backgroundColor:
+        notification.type === "loading"
+          ? "#2196F3"
+          : notification.type === "success"
+            ? "#4CAF50"
+            : "#f44336",
+      color: "white",
+      padding: "15px 30px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+      zIndex: 999999,
+      fontWeight: "bold",
+      fontSize: "16px",
+      display: "flex",
+      alignItems: "center",
+      transition: "all 0.3s ease",
+    }}
+  >
+    {notification.message}
+  </div>
+)}
           {/* HEADER */}
           <header className="header">
             <div className="header-left">

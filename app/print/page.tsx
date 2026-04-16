@@ -18,7 +18,8 @@ function PrintProfileContent() {
 
   useEffect(() => {
     if (!docId) {
-      alert("No Profile ID found.");
+      setNotification({ message: "❌ No Profile ID found.", type: "error" });
+setTimeout(() => setNotification(null), 3000);
       setLoading(false);
       return;
     }
@@ -41,6 +42,11 @@ function PrintProfileContent() {
     const spec = data[specifyKey] || "";
     return spec.trim() !== "" ? `${ans} - ${spec}` : ans;
   };
+
+  const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error" | "loading";
+} | null>(null);
 
   const getEnrollmentString = () => {
     if (!data) return "";
@@ -248,6 +254,35 @@ function PrintProfileContent() {
           🖨️ Print Form
         </button>
       </div>
+
+      {notification && (
+  <div
+    style={{
+      position: "fixed",
+      top: "100px",
+      left: "50%",
+      transform: "translateX(-50%)",
+      backgroundColor:
+        notification.type === "loading"
+          ? "#2196F3"
+          : notification.type === "success"
+            ? "#4CAF50"
+            : "#f44336",
+      color: "white",
+      padding: "15px 30px",
+      borderRadius: "8px",
+      boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
+      zIndex: 999999,
+      fontWeight: "bold",
+      fontSize: "16px",
+      display: "flex",
+      alignItems: "center",
+      transition: "all 0.3s ease",
+    }}
+  >
+    {notification.message}
+  </div>
+)}
 
       {/* PAGE 1 */}
       <div className="page">
