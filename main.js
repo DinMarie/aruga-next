@@ -12,7 +12,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
     },
-    // You can add an icon here later: icon: path.join(__dirname, 'public/logo1.png')
+icon: path.join(__dirname, 'icon.ico')
   });
 
   // Remove the default top menu bar (File, Edit, View, etc.)

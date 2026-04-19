@@ -7,10 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 
-const [notification, setNotification] = useState<{
-  message: string;
-  type: "success" | "error" | "loading";
-} | null>(null);
+
 
 const codeDictionaries: Record<string, Record<string, string>> = {
     religion: { "none": "0", "roman catholic": "1", "islam": "2", "iglesia ni cristo": "3", "aglipay": "4", "seventh day adventist": "5", "bible baptist church": "6", "jehova's witness": "7", "united methodists church": "8", "tribal religions": "9" },
@@ -48,7 +45,14 @@ function FullDetailsEditContent() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+     const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error" | "loading";
+} | null>(null);
+
   useEffect(() => {
+
+    
     if (!docId) {
     setNotification({ message: "❌ No Profile ID found.", type: "error" });
 setTimeout(() => router.push('/table'), 1500);
@@ -710,6 +714,8 @@ setTimeout(() => setNotification(null), 4000);
 }
 
 export default function FullDetailsPage() {
+
+ 
   return (
     <Suspense fallback={<div style={{ padding: '50px', textAlign: 'center', fontFamily: 'Arial' }}>Loading...</div>}>
       <FullDetailsEditContent />

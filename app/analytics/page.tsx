@@ -9,10 +9,7 @@ import Script from "next/script";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 
-const [notification, setNotification] = useState<{
-  message: string;
-  type: "success" | "error" | "loading";
-} | null>(null);
+
 
 const paperDimensions: any = {
   a4: { width: "210mm", height: "297mm" },
@@ -21,6 +18,11 @@ const paperDimensions: any = {
 };
 
 export default function SummaryDashboard() {
+
+  const [notification, setNotification] = useState<{
+  message: string;
+  type: "success" | "error" | "loading";
+} | null>(null);
   const router = useRouter();
 
   // Library load states
