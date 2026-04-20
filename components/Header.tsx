@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import { auth } from "../lib/firebase";
 
@@ -15,21 +15,19 @@ export default function Header({ subtitle, username }: HeaderProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
- const handleLogout = async () => {
-  try {
-    await signOut(auth); // 🔥 ito ang actual logout
-    router.push('/login'); // redirect after logout
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
-};  
-
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // 🔥 ito ang actual logout
+      router.push("/login"); // redirect after logout
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <>
       {/* BINAGO: dashboardHeader na dapat ito */}
       <div className="dashboardHeader">
-        
         {/* LEFT SIDE */}
         <div className="headerLeft">
           <img src="/cswd.png" alt="CSWD Logo" className="logo" />
@@ -37,24 +35,19 @@ export default function Header({ subtitle, username }: HeaderProps) {
         </div>
 
         {/* MIDDLE */}
-       {subtitle && (
-          <h3 className="subtitle">
-            {subtitle}
-          </h3>
-        )}
+        {subtitle && <h3 className="subtitle">{subtitle}</h3>}
 
         {/* RIGHT SIDE */}
-    <div className="dropdown">
-          <button
-            className="dropbtn"
-            onClick={() => setShowMenu(!showMenu)}
-          >
+        <div className="dropdown">
+          <button className="dropbtn" onClick={() => setShowMenu(!showMenu)}>
             {username || "Username"} ▼
           </button>
 
           {showMenu && (
             <div className="headerDropdownContent">
-              <a href="#" className="dropdownItem">Profile</a>
+              <a href="#" className="dropdownItem">
+                Profile
+              </a>
               <a
                 href="#"
                 className="logoutItem"
@@ -72,19 +65,25 @@ export default function Header({ subtitle, username }: HeaderProps) {
       </div>
 
       {/* LOGOUT MODAL */}
-     {/* MODAL SECTION - OKAY NA ITO */}
+      {/* MODAL SECTION - OKAY NA ITO */}
       {showLogoutModal && (
         <div className="modalOverlay">
           <div className="modalBox">
             <p className="modalText">Are you sure you want to logout?</p>
             <div className="modalButtons">
-              <button className="yesBtn" onClick={handleLogout}>YES</button>
-              <button className="noBtn" onClick={() => setShowLogoutModal(false)}>NO</button>
+              <button className="yesBtn" onClick={handleLogout}>
+                YES
+              </button>
+              <button
+                className="noBtn"
+                onClick={() => setShowLogoutModal(false)}
+              >
+                NO
+              </button>
             </div>
           </div>
         </div>
       )}
-
     </>
   );
 }
