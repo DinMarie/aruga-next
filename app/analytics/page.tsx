@@ -364,12 +364,21 @@ export default function SummaryDashboard() {
       "#ff9f40",
       "#512da8",
       "#8bc34a",
+      "#e91e63",
+      "#00bcd4",
+      "#ff5722",
+      "#795548",
     ];
 
     const customLegendPlugin = {
       legend: {
-        position: "right",
+        position: "right", // Keeps it on the side
+        align: "start",
         labels: {
+          boxWidth: 15, // <--- Add this: Makes the colored square smaller (default is 40)
+          font: {
+            size: 9.5, // <--- Add this: Reduces the text size
+          },
           generateLabels: function (chart: any) {
             const data = chart.data;
             const dataset = data.datasets[0];
@@ -412,6 +421,13 @@ export default function SummaryDashboard() {
           animation: false,
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            // <--- ADD THIS BLOCK
+            padding: {
+              left: -200, // Negative value physically pulls the pie to the left gap
+              right: 50, // Gives the legend a little breathing room on the right
+            },
+          },
           plugins: customLegendPlugin,
         },
       });
@@ -432,6 +448,13 @@ export default function SummaryDashboard() {
           animation: false,
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            // <--- ADD THIS BLOCK
+            padding: {
+              left: -200, // Negative value physically pulls the pie to the left gap
+              right: 200, // Gives the legend a little breathing room on the right
+            },
+          },
           plugins: customLegendPlugin,
         },
       });
@@ -560,7 +583,12 @@ export default function SummaryDashboard() {
       <style
         dangerouslySetInnerHTML={{
           __html: `
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: "Segoe UI", Arial, sans-serif; }
+      .analytics-root, .analytics-root * { 
+          box-sizing: border-box; 
+          margin: 0; 
+          padding: 0; 
+          font-family: "Segoe UI", Arial, sans-serif; 
+        }
         
         .analytics-root { 
           position: fixed; top: 150px; bottom: 60px; left: 0; right: 0; 
@@ -625,16 +653,16 @@ export default function SummaryDashboard() {
 
         /* --- Charts & Typography --- */
         .Analytics-paper h1 { font-size: 24px; color: #2a1b3c; border-bottom: 2px solid #8c6d8c; padding-bottom: 10px; margin-bottom: 20px; }
-        .chartCard { width: 100%; margin-bottom: 30px; }
+        .chartCard { width: 100%; margin-bottom: 30px;}
         .chartCard h4 { margin-bottom: 10px; color: #333; font-size: 16px; }
 
-        table {
+       .analytics-root table {
           width: 100%;
           table-layout: fixed;
           border-collapse: collapse;
           border: 1px solid #000;
         }
-        th, td { 
+        .analytics-root th, .analytics-root td { 
           border-right: 1px solid #000; 
           border-bottom: 1px solid #000; 
           padding: 4px 3px; 
@@ -645,7 +673,7 @@ export default function SummaryDashboard() {
           white-space: normal;
           vertical-align: middle;
         }
-        th { 
+        .analytics-root th { 
           background-color: #f2f2f2; 
           font-weight: bold; 
           text-align: center;
@@ -711,11 +739,13 @@ export default function SummaryDashboard() {
             overflow: visible !important; 
           }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          table, tr, td, th { page-break-inside: avoid !important; break-inside: avoid !important; }
+          table, tr, td, th { page-break-inside: avoid !important; break-inside: avoid !important; padding-bottom: 3px !important;}
         }
       `,
         }}
       />
+
+      <Header />
 
       <div className="analytics-root">
         <div
@@ -753,8 +783,6 @@ export default function SummaryDashboard() {
               {notification.message}
             </div>
           )}
-
-          <Header />
 
           {/* FIXED ACTION BAR */}
           <div className="action-bar">
@@ -930,13 +958,13 @@ export default function SummaryDashboard() {
                   >
                     <div className="chartCard">
                       <h4>Disability Summary</h4>
-                      <div style={{ height: "200px", width: "650px" }}>
+                      <div style={{ height: "200px", width: "100%" }}>
                         <canvas ref={pie1Ref}></canvas>
                       </div>
                     </div>
                     <div className="chartCard">
                       <h4>Illness Summary</h4>
-                      <div style={{ height: "200px" }}>
+                      <div style={{ height: "200px", width: "100%" }}>
                         <canvas ref={pie2Ref}></canvas>
                       </div>
                     </div>
