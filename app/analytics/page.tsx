@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import Header from "../../components/Header";
 
 const paperDimensions: any = {
   a4: { width: "210mm", height: "297mm" },
@@ -39,6 +40,7 @@ export default function SummaryDashboard() {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [paperDropdownOpen, setPaperDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [openCategories, setOpenCategories] = useState<{
     [key: string]: boolean;
   }>({
@@ -581,19 +583,14 @@ export default function SummaryDashboard() {
           justify-content: center; align-items: start; gap: 40px; 
         }
 
-        /* --- Header --- */
-        .header { position: fixed; top: 0; left: 0; width: 100%; background-color: #a68cb0; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8e6e9e; z-index: 1000; height: 80px; }
-        .header-title { color: white; font-weight: bold; font-size: 20px; }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .logo-box { width: 50px; height: 50px; background-color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
 
-        /* --- Dropdowns --- */
+
+/* --- Dropdowns --- */
         .dropdown { position: relative; display: inline-block; }
         .dropdown-content { display: none; position: absolute; background-color: white; min-width: 280px; box-shadow: 0px 8px 24px rgba(0,0,0,0.2); z-index: 100; border: 1px solid #ccc; border-radius: 8px; padding: 20px; margin-top: 5px; }
         .dropdown:hover .dropdown-content { display: block; }
-        .user-dropdown { right: 0; min-width: 150px; padding: 0; }
-        .user-dropdown a { display: block; padding: 8px; text-decoration: none; color: #333; }
+        .user-dropdown { right: 0; min-width: 150px; padding: 0; overflow: hidden; }
+        .user-dropdown a { display: block; padding: 12px 16px; text-decoration: none; color: black; }
         .user-dropdown a:hover { background-color: #f1f1f1; }
 
         /* --- Action Bar --- */
@@ -756,48 +753,8 @@ export default function SummaryDashboard() {
               {notification.message}
             </div>
           )}
-          {/* HEADER */}
-          <header className="header">
-            <div className="header-left">
-              <div className="logo-box">
-                <img
-                  src="/images.png"
-                  alt="Logo"
-                  onError={(e) => (e.currentTarget.style.display = "none")}
-                />
-              </div>
-              <span className="header-title">
-                <b>CSWDO - Biñan City</b>
-              </span>
-            </div>
-            <div
-              className="dropdown"
-              onMouseLeave={() => setUserDropdownOpen(false)}
-            >
-              <button
-                className="btn"
-                style={{
-                  color: "white",
-                  fontSize: "18px",
-                  background: "none",
-                }}
-                onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-              >
-                Username &#9662;
-              </button>
-              <div
-                className="dropdown-content user-dropdown"
-                style={{ display: userDropdownOpen ? "block" : "none" }}
-              >
-                <a
-                  href="/"
-                  id="logoutBtn"
-                  style={{ color: "red", borderTop: "1px solid #eee" }}
-                >
-                  Logout
-                </a>
-              </div>
-            </div>
+          <header>
+            <Header />
           </header>
 
           {/* FIXED ACTION BAR */}

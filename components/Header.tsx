@@ -18,7 +18,7 @@ export default function Header({ subtitle, username }: HeaderProps) {
   const handleLogout = async () => {
     try {
       await signOut(auth); // 🔥 ito ang actual logout
-      router.push("/login"); // redirect after logout
+      router.push("/"); // redirect after logout
     } catch (error) {
       console.error("Logout error:", error);
     }
@@ -45,9 +45,6 @@ export default function Header({ subtitle, username }: HeaderProps) {
 
           {showMenu && (
             <div className="headerDropdownContent">
-              <a href="#" className="dropdownItem">
-                Profile
-              </a>
               <a
                 href="#"
                 className="logoutItem"
@@ -56,6 +53,7 @@ export default function Header({ subtitle, username }: HeaderProps) {
                   setShowMenu(false);
                   setShowLogoutModal(true);
                 }}
+                style={{ color: "red", borderTop: "1px solid #eee" }}
               >
                 Logout
               </a>

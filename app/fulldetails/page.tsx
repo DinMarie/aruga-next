@@ -6,6 +6,7 @@ import React, { useState, useEffect, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { db } from "../../lib/firebase";
+import Header from "../../components/Header";
 
 const codeDictionaries: Record<string, Record<string, string>> = {
   religion: {
@@ -567,43 +568,7 @@ function FullDetailsEditContent() {
       `,
         }}
       />
-
-      {/* HEADER */}
-      <div className="header">
-        <div className="header-left">
-          <img
-            style={{
-              display: "flex",
-              gap: "15px",
-              alignItems: "center",
-              width: "50px",
-              height: "50px",
-            }}
-            src="/cswd.png"
-            alt="CSWD Logo"
-          />
-
-          <h2>CSWDO - Binan City</h2>
-        </div>
-        <h3 className="header-title2">
-          Aruga Project Profiling and Assessment Details
-        </h3>
-        <div className="dropdown">
-          <button className="dropbtn" type="button" onClick={toggleMenu}>
-            Username ▼
-          </button>
-          <div
-            id="dropdownMenu"
-            className="dropdown-content"
-            style={{ display: isMenuOpen ? "block" : "none" }}
-          >
-            <a href="/" className="logout">
-              Logout
-            </a>
-          </div>
-        </div>
-      </div>
-
+      <Header />
       <div className="back-button">
         <a
           style={{ cursor: "pointer" }}

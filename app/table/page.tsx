@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useReactToPrint } from "react-to-print";
-
+import Header from "../../components/Header";
 // 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
   barangay: [
@@ -108,6 +108,7 @@ interface ProfileData {
   sex?: string;
   contact?: string;
   address?: string;
+  barangay?: string;
   religion?: string;
   ip?: string;
   disability?: string;
@@ -302,9 +303,7 @@ export default function TablePage() {
         .tablePageRoot .page-container { background-color: white; width: 100%; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
         .tablePageRoot .header { background-color: #a68cb0; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #8e6e9e; flex-shrink: 0; height: 80px; }
         .tablePageRoot .header-left { display: flex; align-items: center; gap: 15px; }
-        .tablePageRoot .logo-box { width: 50px; height: 50px; background-color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .tablePageRoot .logo-box img { width: 100%; height: 100%; object-fit: contain; }
-        .tablePageRoot .header-title { font-size: 20px; color: white; }
+
         .tablePageRoot .dropdown { position: relative; display: inline-block; }
         .tablePageRoot .dropdown-content { display: none; position: absolute; background-color: white; min-width: 150px; box-shadow: 0px 8px 24px rgba(0,0,0,0.2); z-index: 100; border: 1px solid #ccc; border-radius: 8px; right: 0; overflow: hidden; }
         .tablePageRoot .dropdown-content.show { display: block; }
@@ -419,40 +418,7 @@ export default function TablePage() {
 
       <div className="page-container">
         <header className="header">
-          <div className="header-left">
-            <div className="logo-box">
-              <img src="/cswd.png" alt="Logo" />
-            </div>
-            <span className="header-title">
-              <b>CSWDO - Biñan City</b>
-            </span>
-          </div>
-          <div className="dropdown">
-            <button
-              className="btn"
-              style={{
-                color: "white",
-                background: "none",
-                fontSize: "18px",
-                fontWeight: "bold",
-              }}
-              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-            >
-              Username &#9662;
-            </button>
-            <div className={`dropdown-content ${isUserMenuOpen ? "show" : ""}`}>
-              <a
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setShowLogoutModal(true);
-                }}
-                style={{ color: "red", borderTop: "1px solid #eee" }}
-              >
-                Logout
-              </a>
-            </div>
-          </div>
+          <Header />
         </header>
 
         {showLogoutModal && (
