@@ -320,7 +320,7 @@ export default function CombinedAddProfilePage() {
       "province",
       "respondent_name",
       "address",
-      "barangay", // Added barangay here
+      "barangay",
       "r1_name",
       "r2_address",
       "r3_contact",
@@ -333,12 +333,22 @@ export default function CombinedAddProfilePage() {
       "r10_illness",
     ];
 
-    const isMissingData = requiredFields.some(
+    // Find the FIRST missing field instead of just checking if ANY exist
+    const missingField = requiredFields.find(
       (field) => !formData[field] || String(formData[field]).trim() === "",
     );
 
-    if (isMissingData) {
+    if (missingField) {
       setStep1Error("Please fill out all the fields above before proceeding.");
+
+      // Look for the element by ID or Name and scroll to it
+      const el =
+        document.getElementById(missingField) ||
+        document.getElementsByName(missingField)[0];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.focus(); // Highlights the input for the user
+      }
       return;
     }
 
@@ -518,116 +528,132 @@ export default function CombinedAddProfilePage() {
       "recommended",
     ];
 
-    // 2. Check if any base fields are completely empty
-    const isMissingData = requiredStep2Fields.some(
+    // Find the FIRST missing base field
+    const missingBaseField = requiredStep2Fields.find(
       (field) => !formData[field] || String(formData[field]).trim() === "",
     );
 
-    // 3. Check if any conditional "Specify" fields are empty when their trigger is selected
-    let missingSpecify = false;
-    if (formData.house_lot === "Other" && !formData.house_lot_other?.trim())
-      missingSpecify = true;
-    if (
-      formData.modification === "Yes" &&
-      !formData.modification_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.main_source_of_electricity === "Others" &&
-      !formData.electricity_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.water_supply === "Others" &&
-      !formData.water_supply_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.sanitation === "Others" &&
-      !formData.sanitation_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.garbage_disposal === "Others" &&
-      !formData.garbage_disposal_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.health_condition === "Yes" &&
-      !formData.health_condition_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.health_services === "Yes" &&
-      !formData.health_services_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.barriers_accessing_healthcare_services === "Yes" &&
-      !formData.barriers_healthcare_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.currently_enrolled === "Yes" &&
-      !formData.enrolled_grade?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.currently_enrolled === "No" &&
-      !formData.not_enrolled_reason?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.physical_accessibility_features === "Yes" &&
-      !formData.physical_accessibility_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.special_education_programs === "Yes" &&
-      !formData.sped_programs_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.received_learning_support === "Yes" &&
-      !formData.learning_support_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.accessible_learning_materials === "Yes" &&
-      !formData.learning_materials_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.assistive_technology === "Yes" &&
-      !formData.assistive_tech_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.employed_or_entrepreurial_activities === "Yes" &&
-      !formData.employment_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.financial_assistance === "Yes" &&
-      !formData.financial_assistance_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.social_services === "Yes" &&
-      !formData.social_services_specify?.trim()
-    )
-      missingSpecify = true;
-    if (
-      formData.availed_any_services === "Yes" &&
-      !formData.availed_services_specify?.trim()
-    )
-      missingSpecify = true;
+    // Array to map trigger conditions directly to their "Specify" input fields
+    const conditionalFields = [
+      { trigger: "house_lot", condition: "Other", target: "house_lot_other" },
+      {
+        trigger: "modification",
+        condition: "Yes",
+        target: "modification_specify",
+      },
+      {
+        trigger: "main_source_of_electricity",
+        condition: "Others",
+        target: "electricity_specify",
+      },
+      {
+        trigger: "water_supply",
+        condition: "Others",
+        target: "water_supply_specify",
+      },
+      {
+        trigger: "sanitation",
+        condition: "Others",
+        target: "sanitation_specify",
+      },
+      {
+        trigger: "garbage_disposal",
+        condition: "Others",
+        target: "garbage_disposal_specify",
+      },
+      {
+        trigger: "health_condition",
+        condition: "Yes",
+        target: "health_condition_specify",
+      },
+      {
+        trigger: "health_services",
+        condition: "Yes",
+        target: "health_services_specify",
+      },
+      {
+        trigger: "barriers_accessing_healthcare_services",
+        condition: "Yes",
+        target: "barriers_healthcare_specify",
+      },
+      {
+        trigger: "currently_enrolled",
+        condition: "Yes",
+        target: "enrolled_grade",
+      },
+      {
+        trigger: "currently_enrolled",
+        condition: "No",
+        target: "not_enrolled_reason",
+      },
+      {
+        trigger: "physical_accessibility_features",
+        condition: "Yes",
+        target: "physical_accessibility_specify",
+      },
+      {
+        trigger: "special_education_programs",
+        condition: "Yes",
+        target: "sped_programs_specify",
+      },
+      {
+        trigger: "received_learning_support",
+        condition: "Yes",
+        target: "learning_support_specify",
+      },
+      {
+        trigger: "accessible_learning_materials",
+        condition: "Yes",
+        target: "learning_materials_specify",
+      },
+      {
+        trigger: "assistive_technology",
+        condition: "Yes",
+        target: "assistive_tech_specify",
+      },
+      {
+        trigger: "employed_or_entrepreurial_activities",
+        condition: "Yes",
+        target: "employment_specify",
+      },
+      {
+        trigger: "financial_assistance",
+        condition: "Yes",
+        target: "financial_assistance_specify",
+      },
+      {
+        trigger: "social_services",
+        condition: "Yes",
+        target: "social_services_specify",
+      },
+      {
+        trigger: "availed_any_services",
+        condition: "Yes",
+        target: "availed_services_specify",
+      },
+    ];
 
-    // 4. Block submission if anything is missing
-    if (isMissingData || missingSpecify) {
+    // Find the FIRST missing "specify" field
+    const missingSpecifyField = conditionalFields.find(
+      (c) => formData[c.trigger] === c.condition && !formData[c.target]?.trim(),
+    )?.target;
+
+    // Check which one to scroll to (base field takes priority over specify field)
+    const fieldToFocus = missingBaseField || missingSpecifyField;
+
+    // 4. Block submission and scroll if anything is missing
+    if (fieldToFocus) {
       setStep2Error(
         "Please answer all questions and fill in all required 'Specify' fields before submitting.",
       );
+
+      const el =
+        document.getElementById(fieldToFocus) ||
+        document.getElementsByName(fieldToFocus)[0];
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.focus();
+      }
       return;
     }
 

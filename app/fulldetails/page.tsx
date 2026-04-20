@@ -582,7 +582,7 @@ function FullDetailsEditContent() {
             src="/cswd.png"
             alt="CSWD Logo"
           />
-          border-radius: 50%; object-fit: contain;
+
           <h2>CSWDO - Binan City</h2>
         </div>
         <h3 className="header-title2">
