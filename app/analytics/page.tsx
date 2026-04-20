@@ -753,9 +753,8 @@ export default function SummaryDashboard() {
               {notification.message}
             </div>
           )}
-          <header>
-            <Header />
-          </header>
+
+          <Header />
 
           {/* FIXED ACTION BAR */}
           <div className="action-bar">
