@@ -114,9 +114,9 @@ export default function SummaryDashboard() {
         const querySnapshot = await getDocs(collection(db, "profiles"));
         const records = querySnapshot.docs.map((doc) => {
           const data = doc.data();
-
+          let place = data.barangay ? String(data.barangay).trim() : "";
           let rawAddress = String(data.address || data.r2_address || "").trim();
-          let place = "Unknown";
+          place = "Unknown";
           const knownBarangays = [
             "Biñan",
             "Bungahan",

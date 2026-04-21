@@ -92,7 +92,7 @@ const barangaysList = [
   "Bungahan",
   "Canlalay",
   "Casile",
-  "De La Paz",
+  "Dela Paz",
   "Ganado",
   "Langkiwa",
   "Loma",
@@ -660,11 +660,20 @@ export default function CombinedAddProfilePage() {
     // Proceed with saving if validation passes
     setStep2Error("");
     setIsSaving(true);
+
+    const rawAddress = formData.address || formData.r2_address || "";
+    const rawBarangay = formData.barangay || "";
+
+    const fullAddress = [rawAddress, rawBarangay]
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .join(", ");
     try {
       const finalData = {
         ...formData,
         name: formData.r1_name || "",
-        address: formData.r2_address || "",
+        address: fullAddress, // Saved as "123 Main St, Biñan"
+        barangay: rawBarangay,
         contact: formData.r3_contact || "",
         birthday: formData.r4_dob || "",
         religion: formData.r5_religion || "",

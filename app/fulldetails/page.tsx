@@ -88,7 +88,7 @@ const barangaysList = [
   "Bungahan",
   "Canlalay",
   "Casile",
-  "De La Paz",
+  "Dela Paz",
   "Ganado",
   "Langkiwa",
   "Loma",
@@ -463,11 +463,19 @@ function FullDetailsEditContent() {
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setIsSaving(true);
+    const rawAddress = formData.address || formData.r2_address || "";
+    const rawBarangay = formData.barangay || "";
+
+    const fullAddress = [rawAddress, rawBarangay]
+      .map((item) => item.trim())
+      .filter(Boolean)
+      .join(", ");
     try {
       const finalData = {
         ...formData,
         name: formData.r1_name || "",
-        address: formData.r2_address || "",
+        address: rawAddress || "",
+        barangay: rawBarangay || "",
         contact: formData.r3_contact || "",
         birthday: formData.r4_dob || "",
         religion: formData.r5_religion || "",

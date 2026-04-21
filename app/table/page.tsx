@@ -6,6 +6,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../lib/firebase";
 import { useReactToPrint } from "react-to-print";
 import Header from "../../components/Header";
+import TestDataUtil from "@/components/TestDataUtil";
 // 1. FILTER OPTIONS
 const FILTER_OPTIONS = {
   barangay: [
@@ -259,8 +260,15 @@ export default function TablePage() {
     const matchBarangay =
       selectedFilters.barangay.length === 0 ||
       selectedFilters.barangay.some((b) => {
-        const address = normalize(profile.address || "");
         const target = normalize(b);
+
+        // 1. Check the new clean 'barangay' field first (Fast & Accurate)
+        if (profile.barangay) {
+          return normalize(profile.barangay) === target;
+        }
+
+        // 2. Fallback for older database records that only have the combined 'address'
+        const address = normalize(profile.address || "");
         if (target === "binan") {
           const strippedAddress = address
             .replace(/binan city/g, "")
