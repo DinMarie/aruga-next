@@ -201,7 +201,9 @@ function Combobox({
 }: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [filtered, setFiltered] = useState<string[]>(options);
+  const [activeIndex, setActiveIndex] = useState(-1); // Tracks keyboard selection
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: any) {
@@ -211,11 +213,9 @@ function Combobox({
     }
 
     function handleScroll(event: any) {
-      // Keep open if scrolling inside the dropdown menu itself
       if (wrapperRef.current && wrapperRef.current.contains(event.target)) {
         return;
       }
-      // Close dropdown if the main page scrolls
       setIsOpen(false);
     }
 
@@ -228,6 +228,16 @@ function Combobox({
     };
   }, []);
 
+  // Scroll to active item when using arrow keys
+  useEffect(() => {
+    if (isOpen && listRef.current && activeIndex >= 0) {
+      const activeEl = listRef.current.children[activeIndex] as HTMLElement;
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      }
+    }
+  }, [activeIndex, isOpen]);
+
   const handleInputChange = (e: any) => {
     const val = e.target.value;
     onChange(e);
@@ -237,17 +247,43 @@ function Combobox({
       ),
     );
     setIsOpen(true);
+    setActiveIndex(-1); // Reset selection when typing
   };
 
   const handleSelect = (option: string) => {
     onChange({ target: { name, id, value: option, type: "text" } });
     setIsOpen(false);
+    setActiveIndex(-1);
   };
 
   const handleKeyDown = (e: any) => {
-    if (e.key === "Tab" && isOpen && filtered.length > 0) {
-      onChange({ target: { name, id, value: filtered[0], type: "text" } });
-      setIsOpen(false);
+    // Open menu if closed and pressing down/up
+    if (!isOpen && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+      setIsOpen(true);
+      return;
+    }
+
+    if (isOpen) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) =>
+          prev < filtered.length - 1 ? prev + 1 : prev,
+        );
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) => (prev > 0 ? prev - 1 : 0));
+      } else if (e.key === "Enter") {
+        e.preventDefault(); // Prevent form submission
+        if (activeIndex >= 0 && activeIndex < filtered.length) {
+          handleSelect(filtered[activeIndex]);
+        } else if (filtered.length > 0) {
+          handleSelect(filtered[0]); // Default to first if none highlighted
+        }
+      } else if (e.key === "Tab" && filtered.length > 0) {
+        handleSelect(activeIndex >= 0 ? filtered[activeIndex] : filtered[0]);
+      } else if (e.key === "Escape") {
+        setIsOpen(false);
+      }
     }
   };
 
@@ -275,12 +311,13 @@ function Combobox({
       />
       {!hideIcon && <span className="combo-icon">▼</span>}
       {isOpen && filtered.length > 0 && (
-        <ul className="combo-menu">
+        <ul className="combo-menu" ref={listRef}>
           {filtered.map((opt, i) => (
             <li
               key={i}
               onClick={() => handleSelect(opt)}
-              className="combo-item"
+              onMouseEnter={() => setActiveIndex(i)} // Highlight on mouse hover
+              className={`combo-item ${i === activeIndex ? "active-item" : ""}`}
             >
               {opt}
             </li>
@@ -739,10 +776,13 @@ export default function CombinedAddProfilePage() {
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
 }
-            .combo-item {
-            padding: 8px 15px; cursor: pointer; font-size: 14px; color: #333; transition: 0.15s ease; margin: 0;
-            }
-            .combo-item:hover { background-color: #f4f0fa; color: #512da8; font-weight: 600; }
+         .combo-item {
+          padding: 8px 15px; cursor: pointer; font-size: 14px; color: #333; transition: 0.15s ease; margin: 0;
+        }
+        /* ADDED: .active-item for keyboard navigation highlighting */
+        .combo-item:hover, .combo-item.active-item { 
+          background-color: #f4f0fa; color: #512da8; font-weight: 600; 
+        }
         `,
         }}
       />
