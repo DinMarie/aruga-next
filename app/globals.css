@@ -1232,7 +1232,8 @@ body {
   .filterGroupContainer,
   .bottom_navi,
   header,
-  .header {
+  .header,
+  .dashboardHeader {
     display: none !important;
   }
 

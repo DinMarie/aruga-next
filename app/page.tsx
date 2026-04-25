@@ -6,7 +6,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../lib/firebase";
 
 const MAX_ATTEMPTS = 3;
-const LOCK_SECONDS = 500;
+const LOCK_SECONDS = 600;
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -79,6 +79,11 @@ export default function LoginPage() {
           }
         }, 4000);
       });
+  };
+  const formatTime = (totalSeconds: number) => {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   return (
@@ -193,7 +198,7 @@ export default function LoginPage() {
               disabled={isLocked}
               style={{ marginTop: "5px" }}
             >
-              {isLocked ? `Locked (${lockTimeRemaining}s)` : "Login"}
+              {isLocked ? `Locked (${formatTime(lockTimeRemaining)})` : "Login"}
             </button>
           </form>
         </div>

@@ -7,6 +7,7 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import Header from '../../components/Header';
 
 function PrintProfileContent() {
   const searchParams = useSearchParams();
@@ -18,8 +19,7 @@ function PrintProfileContent() {
 
   useEffect(() => {
     if (!docId) {
-      setNotification({ message: "❌ No Profile ID found.", type: "error" });
-setTimeout(() => setNotification(null), 3000);
+      alert("No Profile ID found.");
       setLoading(false);
       return;
     }
@@ -42,11 +42,6 @@ setTimeout(() => setNotification(null), 3000);
     const spec = data[specifyKey] || "";
     return spec.trim() !== "" ? `${ans} - ${spec}` : ans;
   };
-
-  const [notification, setNotification] = useState<{
-  message: string;
-  type: "success" | "error" | "loading";
-} | null>(null);
 
   const getEnrollmentString = () => {
     if (!data) return "";
@@ -101,21 +96,34 @@ setTimeout(() => setNotification(null), 3000);
           text-align: center;
           padding: 6px;
           font-size: 13px;
-          margin: 0;
+          margin: 24px 0 0 0;
           text-transform: uppercase;
           font-weight: bold;
-          border: 1pt solid #000;
-          border-bottom: none;
+          border: 2pt solid #000;
+          border-bottom:  2pt solid #000;
+          margin-bottom: 0;
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
         }
 
-        .fullDetailsWrapper h3.subsection-title {
-          font-size: 13px;
-          font-weight: bold;
-          margin: 20px 0 10px 0;
-          text-transform: uppercase;
-        }
+    .fullDetailsWrapper h3.subsection-title {
+  font-size: 13px;
+  font-weight: bold;
+  margin: 24px 0 12px 0;
+  text-transform: uppercase;
+}
+
+/* Space after section title banners before content starts */
+.fullDetailsWrapper h2.section-title + *,
+.fullDetailsWrapper h2.section-title + h3.subsection-title {
+  margin-top: 16px !important;
+}
+
+/* Breathing room between each q-block */
+.fullDetailsWrapper .q-block {
+  margin-top: 18px;
+  font-size: 12px;
+}
 
         .fullDetailsWrapper table {
           width: 100%;
@@ -137,7 +145,7 @@ setTimeout(() => setNotification(null), 3000);
 
         .fullDetailsWrapper .family-size-header {
           border: 1pt solid #000;
-          border-top: none;
+          border-top: 1pt solid #000;
           border-bottom: none;
           padding: 10px;
           font-weight: bold;
@@ -254,35 +262,7 @@ setTimeout(() => setNotification(null), 3000);
           🖨️ Print Form
         </button>
       </div>
-
-      {notification && (
-  <div
-    style={{
-      position: "fixed",
-      top: "100px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      backgroundColor:
-        notification.type === "loading"
-          ? "#2196F3"
-          : notification.type === "success"
-            ? "#4CAF50"
-            : "#f44336",
-      color: "white",
-      padding: "15px 30px",
-      borderRadius: "8px",
-      boxShadow: "0 4px 15px rgba(0,0,0,0.3)",
-      zIndex: 999999,
-      fontWeight: "bold",
-      fontSize: "16px",
-      display: "flex",
-      alignItems: "center",
-      transition: "all 0.3s ease",
-    }}
-  >
-    {notification.message}
-  </div>
-)}
+      
 
       {/* PAGE 1 */}
       <div className="page">
@@ -322,7 +302,7 @@ setTimeout(() => setNotification(null), 3000);
 
         <h2 className="section-title">FAMILY PROFILE</h2>
         <div className="family-size-header">
-          H1. Bilang ng Miyembro (Family Size): <span style={{ display: 'inline-block', borderBottom: '1pt solid #000', width: '50px', textAlign: 'center' }}>{data.h1_family_size || data.family_size}</span>
+          H1. Bilang ng Miyembro (Family Size): <span style={{ display: 'inline-block', borderBottom: '1pt solid #000',borderTop: '1pt solid #000',width: '50px', textAlign: 'center' }}>{data.h1_family_size || data.family_size}</span>
         </div>
         <table style={{ textAlign: 'center' }}>
           <thead>
