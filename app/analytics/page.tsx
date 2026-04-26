@@ -51,6 +51,7 @@ export default function SummaryDashboard() {
   const chartInstances = useRef<{ pie1: any, pie2: any, bar: any }>({ pie1: null, pie2: null, bar: null });
 
   // 1. Fetch & Sanitize Data from Firebase
+// 1. Fetch & Sanitize Data from Firebase
   useEffect(() => {
     async function loadData() {
       try {
@@ -58,43 +59,53 @@ export default function SummaryDashboard() {
         const records = querySnapshot.docs.map(doc => {
           const data = doc.data();
           
-          let rawAddress = String(data.address || data.r2_address || "").trim();
+          // --- BARANGAY FIX ---
           let place = "Unknown";
-          const knownBarangays = ["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mampalasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-Soro", "Timbao", "Tubigan", "Zapote"];
+          const knownBarangays = ["Biñan", "Bungahan", "Canlalay", "Casile", "De La Paz", "Ganado", "Langkiwa", "Loma", "Malaban", "Malamig", "Mamplasan", "Platero", "Poblacion", "San Antonio", "San Francisco", "San Jose", "San Vicente", "Santo Domingo", "Santo Niño", "Santo Tomas", "Soro-Soro", "Timbao", "Tubigan", "Zapote"];
           
-          const normalizedAddress = rawAddress.toLowerCase().replace(/ñ/g, 'n');
-          
-          const strippedAddress = normalizedAddress
-            .replace(/binan city/g, "")
-            .replace(/city of binan/g, "")
-            .replace(/binan, laguna/g, "");
+          // 1. Try checking the clean 'barangay' field first
+          let rawBarangay = String(data.barangay || "").trim();
+          if (rawBarangay) {
+             const exactMatch = knownBarangays.find(b => 
+                b.toLowerCase().replace(/ñ/g, 'n') === rawBarangay.toLowerCase().replace(/ñ/g, 'n')
+             );
+             if (exactMatch) place = exactMatch;
+          }
 
-          for (let b of knownBarangays) {
-              const normalizedB = b.toLowerCase().replace(/ñ/g, 'n');
-              
-              if (normalizedB === "binan") {
-                  if (strippedAddress.includes("binan")) {
-                      place = b;
-                      break;
-                  }
-              } else {
-                  if (normalizedAddress.includes(normalizedB)) {
-                      place = b;
-                      break;
+          // 2. Fallback to address parsing if barangay is still Unknown
+          if (place === "Unknown") {
+              let rawAddress = String(data.address || data.r2_address || "").trim();
+              const normalizedAddress = rawAddress.toLowerCase().replace(/ñ/g, 'n');
+              const strippedAddress = normalizedAddress
+                .replace(/binan city/g, "")
+                .replace(/city of binan/g, "")
+                .replace(/binan, laguna/g, "");
+
+              for (let b of knownBarangays) {
+                  const normalizedB = b.toLowerCase().replace(/ñ/g, 'n');
+                  if (normalizedB === "binan") {
+                      if (strippedAddress.includes("binan")) { place = b; break; }
+                  } else {
+                      if (normalizedAddress.includes(normalizedB)) { place = b; break; }
                   }
               }
           }
+
+          // --- NORMALIZATION FIX (Fixes Duplicate Columns) ---
+          // Helper function to capitalize just the first letter so "INTELLECTUAL" becomes "Intellectual"
+          const normalizeText = (str: string) => {
+              const s = str.trim();
+              if (!s || s.toLowerCase() === "none" || s === "0") return "None";
+              return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+          };
 
           let sex = String(data.sex || data.r7_sex || "Unknown").trim();
           if (sex.toLowerCase() === "male") sex = "Male";
           else if (sex.toLowerCase() === "female") sex = "Female";
           else sex = "Unknown";
 
-          let d = String(data.disability || data.r9_disability || "None").trim();
-          if (!d || d.toLowerCase() === "none" || d === "0") d = "None";
-
-          let i = String(data.illness || data.r10_illness || "None").trim();
-          if (!i || i.toLowerCase() === "none" || i === "0") i = "None";
+          let d = normalizeText(String(data.disability || data.r9_disability || "None"));
+          let i = normalizeText(String(data.illness || data.r10_illness || "None"));
 
           return { sex, place, disabilities: d, illness: i };
         });
@@ -483,34 +494,35 @@ export default function SummaryDashboard() {
           #pagesContainer { zoom: 1 !important; transform: scale(1) !important; gap: 0 !important; display: block !important; padding: 0 !important; margin: 0 !important; width: 100% !important;}
           .Analytics-paper { box-shadow: none !important; margin: 0 !important; padding: 0.5in !important; page-break-after: always !important; break-after: page !important; page-break-inside: avoid !important; overflow: visible !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            /* ✅ ADD FIX 2 RIGHT HERE */
-            .Analytics-paper [dangerouslySetInnerHTML],
-.Analytics-paper > div > div {
-  font-size: 16pt !important;
-  line-height: 1.8 !important;
-}
-.Analytics-paper h3 {
-  font-size: 16pt !important;
-}
+          /* ✅ ADD FIX 2 RIGHT HERE */
+          .Analytics-paper [dangerouslySetInnerHTML],
+          .Analytics-paper > div > div {
+            font-size: 14pt !important;
+            line-height: 1.6 !important;
+          }
+          .Analytics-paper h3 {
+            font-size: 14pt !important;
+          }
             
           table {
-            font-size: 13pt !important;
+            font-size: 10pt !important; /* Slightly smaller to fit more columns */
             width: 100% !important;
             margin-bottom: 16pt !important;
           }
           th, td {
-            font-size: 13pt !important;
-            padding: 8pt 10pt !important;
-            line-height: 1.4 !important;
+            font-size: 10pt !important; /* Matches table font size */
+            padding: 6pt 4pt !important; /* Tighter padding saves horizontal space */
+            line-height: 1.2 !important;
           }
           th {
-            font-size: 13pt !important;
             font-weight: bold !important;
           }
+          
+          /* THIS IS THE CRITICAL FIX */
           .Analytics-paper table th,
           .Analytics-paper table td {
-            white-space: normal !important;
-            word-break: break-word !important;
+            white-space: nowrap !important; /* Forces words to stay on one line */
+            /* Removed the word-break property completely */
           }
             
           table, tr, td, th { page-break-inside: avoid !important; break-inside: avoid !important; }
