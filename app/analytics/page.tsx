@@ -10,10 +10,10 @@ import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 
 const paperDimensions: any = {
-  a4: { width: "284mm", height: "297mm" },
-  letter: { width: "290mm", height: "279mm" },
-  long: { width: "290mm", height: "330mm" }
-};
+  a4: { width: "210mm", height: "297mm" },
+  letter: { width: "215.9mm", height: "279.4mm" },
+  long: { width: "215.9mm", height: "330.2mm" }
+}
 
 export default function SummaryDashboard() {
   const router = useRouter();
@@ -311,16 +311,20 @@ export default function SummaryDashboard() {
   };
 
   // 5. Download PDF
-  const downloadPDF = async () => {
+const downloadPDF = async () => {
     if (!h2cLoaded || !jspdfLoaded) return alert("PDF Libraries are still loading...");
     
     const html2canvas = (window as any).html2canvas;
     const jsPDF = (window as any).jspdf.jsPDF;
     
     const pages = document.querySelectorAll(".Analytics-paper");
-    if (pages.length === 0) return;
+    const container = document.getElementById("pagesContainer"); // NEW: Get the container
+    if (pages.length === 0 || !container) return;
 
-    // Temporarily remove scroll boundaries during PDF export so HTML2Canvas captures the entire hidden table.
+    // NEW: Temporarily reset zoom to 1 so html2canvas doesn't get confused by scaling
+    const originalZoom = container.style.zoom;
+    container.style.zoom = '1';
+
     const wrappers = document.querySelectorAll('.category-table-wrapper');
     const landscapePapers = document.querySelectorAll('.Analytics-paper.landscape-paper');
     
@@ -333,10 +337,16 @@ export default function SummaryDashboard() {
 
     landscapePapers.forEach((el: any) => {
       el.dataset.height = el.style.height;
-      el.style.height = 'auto'; // Let the div extend so the table can fully render
+      el.style.height = 'auto';
     });
 
-    let pdfFormat = paperSize === "long" ? [216, 330] : paperSize;
+    pages.forEach((el: any) => {
+      el.dataset.border = el.style.border || '';
+      el.style.border = 'none';
+    });
+
+    // NEW: Use exact numbers for 'long' format so jsPDF creates the right page size
+    let pdfFormat = paperSize === "long" ? [215.9, 330.2] : paperSize;
     let pdf = new jsPDF('p', 'mm', pdfFormat);
 
     for(let i=0; i<pages.length; i++){
@@ -347,13 +357,17 @@ export default function SummaryDashboard() {
         pdf.addPage(pdfFormat, orientation);
       }
 
-      const canvas = await html2canvas(pages[i] as HTMLElement, {scale: 2});
+      // NEW: Added useCORS and fixed scale
+      const canvas = await html2canvas(pages[i] as HTMLElement, { 
+          scale: 2, 
+          useCORS: true 
+      });
+      
       const imgData = canvas.toDataURL("image/png");
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
 
-      // Calculate ratio to prevent stretching
       const ratio = canvas.width / canvas.height;
       let drawWidth = pdfWidth;
       let drawHeight = pdfWidth / ratio;
@@ -363,14 +377,12 @@ export default function SummaryDashboard() {
           drawWidth = drawHeight * ratio;
       }
       
-      // Center the image if it doesn't take up the full paper
       const xOffset = (pdfWidth - drawWidth) / 2;
-      const yOffset = (pdfHeight - drawHeight) / 2;
+      const yOffset = 0;
 
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, drawWidth, drawHeight);
     }
 
-    // Restore table wrapper styles back to dashboard defaults
     wrappers.forEach((el: any) => {
       el.style.maxHeight = el.dataset.maxHeight;
       el.style.overflowY = el.dataset.overflowY;
@@ -379,6 +391,13 @@ export default function SummaryDashboard() {
     landscapePapers.forEach((el: any) => {
       el.style.height = el.dataset.height;
     });
+
+    pages.forEach((el: any) => {
+      el.style.border = el.dataset.border;
+    });
+
+    // NEW: Restore the zoom back to what the user had it set to
+    container.style.zoom = originalZoom; 
 
     pdf.save("Disability_Analytics.pdf");
   };
@@ -478,12 +497,10 @@ export default function SummaryDashboard() {
         .btn-apply { background-color: #512da8 !important; color: white; padding: 8px 22px !important; border-radius: 30px !important; font-size: 0.9rem; border: none; cursor: pointer;}
         .btn-clear-all { color: #666; text-decoration: underline; padding: 5px 8px; background: none; border: none; cursor: pointer; }
 
-        /* --- PRINT CSS --- */
-        @media print {
-
-        
-          @page { size: portrait; margin: 10mm; }
-          @page landscape-page { size: landscape; margin: 10mm; }
+@media print {
+          @page { size: auto; margin: 5mm; } /* Tighter margins prevent cutoff */
+          
+          @page landscape-page { size: landscape; margin: 5mm; }
           .landscape-paper { page: landscape-page; width: 100% !important; height: auto !important; max-height: none !important; }
           .category-table-wrapper { overflow: visible !important; max-height: none !important; }
 
@@ -491,8 +508,26 @@ export default function SummaryDashboard() {
           .action-bar, .bottom_navi, .header, .filter-sidebar-wrapper { display: none !important; }
           .analytics-root { position: static !important; overflow: visible !important; height: auto !important; width: 100% !important; background: white !important; display: block !important;}
           .page-container { background: white !important; padding: 0 !important; margin: 0 !important; height: auto !important; overflow: visible !important; box-shadow: none !important; display: block !important; width: 100% !important;}
+          
+          /* Force Zoom to 100% during print so it doesn't break layout */
           #pagesContainer { zoom: 1 !important; transform: scale(1) !important; gap: 0 !important; display: block !important; padding: 0 !important; margin: 0 !important; width: 100% !important;}
-          .Analytics-paper { box-shadow: none !important; margin: 0 !important; padding: 0.5in !important; page-break-after: always !important; break-after: page !important; page-break-inside: avoid !important; overflow: visible !important; }
+          
+          /* Let the paper fill 100% of the print bounds */
+          .Analytics-paper { 
+            width: 100% !important; 
+            max-width: 100% !important;
+            height: auto !important;
+            min-height: 100% !important;
+            box-sizing: border-box !important;
+            box-shadow: none !important; 
+            margin: 0 !important; 
+            padding: 10mm !important; /* Internal padding instead of margins */
+            border: none !important; 
+            page-break-after: always !important; 
+            break-after: page !important; 
+            page-break-inside: avoid !important; 
+            overflow: visible !important; 
+          }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           /* ✅ ADD FIX 2 RIGHT HERE */
           .Analytics-paper [dangerouslySetInnerHTML],
@@ -758,7 +793,7 @@ export default function SummaryDashboard() {
                     {/* Render up to 2 tables vertically stacked */}
                     <div style={{ display: 'flex', flexDirection: 'column', width: '90%', alignItems: 'center', gap: '40px' }}>
                       {catChunk.map((catData: any, idx: number) => (
-                        <div key={idx} className="category-table-wrapper" style={{ width: '100%', maxHeight: '350px', overflowY: 'auto', paddingRight: '10px' }}>
+                        <div key={idx} className="category-table-wrapper" style={{ width: '100%' }}>
                           <table style={{ width: '100%', fontSize: '15px', border: '2px solid #000' }}>
                             <thead>
                               <tr>
