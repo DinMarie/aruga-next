@@ -458,14 +458,14 @@ const downloadPDF = async () => {
         .btn-back { background-color: #f1f1f1; border: 1px solid #ccc; padding: 8px 18px; }
 
         .paper-choice-dropdown { display: none; position: absolute; background-color: #512da8; min-width: 100px; z-index: 100; padding: 10px; flex-direction: column; gap: 10px; margin-top: -5px; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }
-        .size { border: none; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; width: 94px; height: 25px; border-radius: 20px; }
+        .size { border: none; font-weight: bold; cursor: pointer; color: #512da8; transition: 0.2s; width: 94px; height: 25px; border-radius: 20px; }
         .paper-choice-dropdown.show { display: flex; }
         .paper-choice-dropdown a { display: block; padding: 10px 15px; text-decoration: none; color: #333; }
         .paper-choice-dropdown a:hover { background-color: #f1f1f1; color: #512da8; cursor: pointer; }
         .back-Icon { width: 20px; height: 20px; }
 
         /* --- Paper Container --- */
-        .Analytics-paper { width: 100%; padding: 30px; border-color: black; border: 1px solid #ccc; box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2); display: flex; flex-direction: column; overflow: hidden; background-color: white; }
+        .Analytics-paper { width: 100%; padding: 30px; border-color: black; border: 1px solid #ccc; box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2); display: flex; flex-direction: column; overflow: visible; background-color: white; }
 
         /* --- Charts & Typography --- */
         .Analytics-paper h1 { font-size: 24px; color: #2a1b3c; border-bottom: 2px solid #8c6d8c; padding-bottom: 10px; margin-bottom: 20px; }
@@ -539,25 +539,31 @@ const downloadPDF = async () => {
             font-size: 14pt !important;
           }
             
+         /* 1. Ensure the table respects the page width */
           table {
-            font-size: 10pt !important; /* Slightly smaller to fit more columns */
+            font-size: 9pt !important; /* Slightly smaller text */
             width: 100% !important;
+            max-width: 100% !important;
             margin-bottom: 16pt !important;
           }
+
+          /* 2. Tighten up the spacing */
           th, td {
-            font-size: 10pt !important; /* Matches table font size */
-            padding: 6pt 4pt !important; /* Tighter padding saves horizontal space */
+            font-size: 9pt !important; 
+            padding: 4px !important; /* Tighter padding saves horizontal space */
             line-height: 1.2 !important;
           }
-          th {
-            font-weight: bold !important;
-          }
           
-          /* THIS IS THE CRITICAL FIX */
+          /* 3. Allow text to wrap instead of bleeding off the page */
           .Analytics-paper table th,
           .Analytics-paper table td {
-            white-space: nowrap !important; /* Forces words to stay on one line */
-            /* Removed the word-break property completely */
+            white-space: normal !important; /* CRITICAL: Replaces 'nowrap' */
+            word-wrap: break-word !important;
+          }
+
+          /* 4. Force the extra-wide landscape tables to scale down to fit */
+          .landscape-paper table {
+            zoom: 0.75 !important; /* Shrinks the table by 25% specifically for print/PDF */
           }
             
           table, tr, td, th { page-break-inside: avoid !important; break-inside: avoid !important; }
@@ -691,12 +697,13 @@ const downloadPDF = async () => {
                 </div>
 
                 {/* PAGE 2: BAR CHART */}
-                <div className="Analytics-paper" style={{ width: currentPaper.width, height: currentPaper.height }}>
+                {/* ADD 'landscape-paper' AND FLIP WIDTH/HEIGHT */}
+                <div className="Analytics-paper landscape-paper" style={{ width: currentPaper.height, height: currentPaper.width }}>
                   <h1>Disability Records Analytics (Part 2)</h1>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '30px', flex: 1 }}>
                     <div className="chartCard" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                         <h4>Population Summary</h4>
-                        <div style={{ flex: 1, minHeight: '500px', width: '100%' }}><canvas ref={barRef}></canvas></div>
+                        <div style={{ position: 'relative', height: '400px', width: '100%' }}><canvas ref={barRef}></canvas></div>
                     </div>
                   </div>
                 </div>
